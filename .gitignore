@@ -47,5 +47,7 @@ Debug/
 .config/
 .launches/
 .settings/
+.metadata/
+dvt/
 
 

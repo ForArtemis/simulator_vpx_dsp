@@ -138,7 +138,7 @@ void IPC_init(
 	{
 		System_abort("MessageQ_alloc failed\n" );
 	}
-	System_printf("(MsgCore23456ToCore1*)MessageQ_alloc(HEAP_ID_CORE23456_CORE1, sizeof(MsgCore23456ToCore1)); \n");
+	System_printf("(MsgCore34567ToCore1*)MessageQ_alloc(HEAP_ID_CORE34567_CORE1, sizeof(MsgCore34567ToCore1)); \n");
 
 
 	/* Create the heap that will be used to allocate messages. */
@@ -227,8 +227,8 @@ void MainThread()
 		for(i = 0 ; i < 20 ; i++)
 		{
 			OcrientationVectorCal(
-					ArrayElementCoordinateX[CoreNum-2][i],
-					ArrayElementCoordinateY[CoreNum-2][i],
+					ArrayElementCoordinateX[CoreNum-3][i],
+					ArrayElementCoordinateY[CoreNum-3][i],
 					Msg2To34567Ptr->TargetAngleTheta,
 					Msg2To34567Ptr->TargetAnglePhi,
 					(Msg34567To1Ptr->OrientationVectorReal + i),
@@ -236,12 +236,16 @@ void MainThread()
 				);
 		}
 
-		//send Message to CORE1
-		MessageQ_setMsgId(&(Msg34567To1Ptr->header), Msg2To34567Ptr->header.msgId);
-		status = MessageQ_put(QueueIdCore34567ToCore1, &(Msg34567To1Ptr->header));
-		if (status < 0)
+		if((CoreNum == 7))
 		{
-		   System_abort("MessageQ_put had a failure/error\n");
+			//send Message to CORE1
+			MessageQ_setMsgId(&(Msg34567To1Ptr->header), ((Msg2To34567Ptr->header.msgId) + 1) * CoreNum);
+			status = MessageQ_put(QueueIdCore34567ToCore1, &(Msg34567To1Ptr->header));
+			if (status < 0)
+			{
+			   System_abort("MessageQ_put had a failure/error\n");
+			}
+			System_printf("MessageQ_put\n");
 		}
 	}
 }

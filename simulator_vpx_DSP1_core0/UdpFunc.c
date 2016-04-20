@@ -83,134 +83,15 @@ extern HyplinkDataDsp1ToDsp2	HyplinkDataDsp1ToDsp2Ptr;
 
 int			TimerCnt = 0;
 int         ManualMsgID = 0;
-
 int			CurrentMode = SLEEP_MODE;
-
-////---------------------------------------------
-//char	pBuf_static[1024];
-//#pragma DATA_ALIGN (pBuf, 4);
+int			MsgID = 0;
 
 
+//网口接收函数
+int 		UdpFunc( SOCKET s, UINT32 unused );
 
 
-//extern Timer_Handle ManualModeTimer;
-//
-//extern Semaphore_Handle ManualTimingSemHandle;
 
-
-//void 	DistanceDelayCal(UdpFrame* UdpFramePtr, MsgCore0ToCore1* MsgCore0ToCore1Ptr);
-//Uint32 	DopplerFrePincCal(float speed);
-//void 	AmplitudeCal(float* ScatteringPointPowerX, float* ScatteringPointPowerZ, float* ScatteringPointPowerY,
-//			Uint16* ScatteringPointAmplitudeX, Uint16* ScatteringPointAmplitudeY, Uint16* ScatteringPointAmplitudeZ);
-//float 	LineDeviationCal(UdpFrame *Frame,
-//								Uint16 ScatteringPointAmplitudeY[SCATTERTING_POINT_NUM], Uint16 ScatteringPointAmplitudeZ[SCATTERTING_POINT_NUM],
-//										enum AngleDirectionEnum AngleDirection);
-int 	UdpFunc( SOCKET s, UINT32 unused );
-
-
-//void DistanceDelayCal(UdpFrame* UdpFramePtr, MsgCore0ToCore1* MsgCore0ToCore1Ptr)
-//{
-//	//Minus SCATTERING_POINT_MAX_SIZE/2, because the position can be negative.
-//	int	i;
-//	MsgCore0ToCore1Ptr->DistanceDelay = UdpFramePtr->TargetDistance / LIGHT_SPEED * FPGA_CLK_FRE - RANGE_PROFILE_NUM/2; 	// delay = 2R/C*FPGA_CLK_FRE
-//	for(i = 0 ; i < SCATTERTING_POINT_NUM ; i++)
-//	{
-//		MsgCore0ToCore1Ptr->ScatteringPointPosition[i] = UdpFramePtr->ScatteringPointPositionX[i] + RANGE_PROFILE_NUM/2;
-//	}
-//}
-//
-//Uint32 DopplerFrePincCal(float speed)
-//{
-//	Uint32 Pinc;
-//
-//	Pinc = 2 * speed * WAVE_FRE / LIGHT_SPEED * 0xffffffff / FPGA_CLK_FRE;
-//	return	Pinc;
-//}
-//
-//void AmplitudeCal(float* ScatteringPointPowerX, float* ScatteringPointPowerY, float* ScatteringPointPowerZ,
-//						Uint16* ScatteringPointAmplitudeX, Uint16* ScatteringPointAmplitudeY, Uint16* ScatteringPointAmplitudeZ)
-//{
-//	int 	i;
-//	for(i = 0 ; i < SCATTERTING_POINT_NUM ; i++)
-//	{
-//		if(ScatteringPointPowerX[i] != (ScatteringPointPowerX[i] + 1))
-//			ScatteringPointAmplitudeX[i] = sqrt(pow(10,((ScatteringPointPowerX[i] - POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
-//		else
-//			ScatteringPointAmplitudeX[i] = 0;
-//		if(ScatteringPointPowerY[i] != (ScatteringPointPowerY[i] + 1))
-//			ScatteringPointAmplitudeY[i] = sqrt(pow(10,((ScatteringPointPowerY[i] - POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
-//		else
-//			ScatteringPointAmplitudeY[i] = 0;
-//		if(ScatteringPointPowerZ[i] != (ScatteringPointPowerZ[i] + 1))
-//			ScatteringPointAmplitudeZ[i] = sqrt(pow(10,((ScatteringPointPowerZ[i] - POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
-//		else
-//			ScatteringPointAmplitudeZ[i] = 0;
-//	}
-//}
-//
-///* Calculate line deviation caused by amplitude fluctuation of each scattering point */
-//float LineDeviationCal(UdpFrame *Frame,
-//								Uint16 ScatteringPointAmplitudeY[SCATTERTING_POINT_NUM], Uint16 ScatteringPointAmplitudeZ[SCATTERTING_POINT_NUM],
-//										enum AngleDirectionEnum AngleDirection)
-//{
-//	int	i;
-//	int j;
-//
-//	float 	*ScatteringPointPositionPtr;
-//
-//	float 	LineDeviationMember = 0;
-//	float 	LineDeviationDenominator = 0;
-//
-//	float 	EchoPhase[SCATTERTING_POINT_NUM];
-//	Uint16* ScatteringPointAmplitude;
-//
-//	/* Select scattering point position to be used. */
-//	if(AngleDirection == THETA)
-//	{
-//		ScatteringPointPositionPtr = Frame->ScatteringPointPositionY;
-//		ScatteringPointAmplitude   = ScatteringPointAmplitudeY;
-//	}
-//	else if(AngleDirection == PHI)
-//	{
-//		ScatteringPointPositionPtr = Frame->ScatteringPointPositionZ;
-//		ScatteringPointAmplitude   = ScatteringPointAmplitudeZ;
-//	}
-//	else
-//	{
-//		System_abort("Error occurred to select AngleDirectionEnum. \n");
-//	}
-//
-//	/* Initialize echo phase, which is relative to scattering point position. */
-//	for(i = 0 ; i < SCATTERTING_POINT_NUM ; i++)
-//	{
-//		EchoPhase[i] = ScatteringPointPositionPtr[i] * (LIGHT_SPEED / 2 / FPGA_CLK_FRE) / (LIGHT_SPEED / WAVE_FRE) * 2 * PI;
-//	}
-//
-//	/* There are 10 scattering points. */
-//	for(i = 0 ; i < SCATTERTING_POINT_NUM ; i++)
-//	{
-//		for(j= 0 ; j < SCATTERTING_POINT_NUM ; j++)
-//		{
-//			LineDeviationMember = LineDeviationMember +
-//					ScatteringPointAmplitude[j] * ScatteringPointAmplitude[i] * ScatteringPointPositionPtr[j] * (LIGHT_SPEED / 2 / FPGA_CLK_FRE) *
-//						cos(EchoPhase[i] - EchoPhase[j] );
-//		}
-//	}
-//	for(i = 0 ; i < SCATTERTING_POINT_NUM ; i++)
-//	{
-//		for(j = 0 ; j < SCATTERTING_POINT_NUM ; j++)
-//		{
-//			LineDeviationDenominator = LineDeviationDenominator +
-//								ScatteringPointAmplitude[j] * ScatteringPointAmplitude[i] *
-//									cos(EchoPhase[i] - EchoPhase[j] );
-//		}
-//	}
-//
-//	return (LineDeviationMember/LineDeviationDenominator);
-//}
-
-
-int						MsgID = 0;
 
 int UdpFunc( SOCKET s, UINT32 unused )
 {
@@ -230,7 +111,7 @@ int UdpFunc( SOCKET s, UINT32 unused )
     setsockopt( s, SOL_SOCKET, SO_RCVTIMEO, &TimeOut, sizeof( TimeOut ) );
 
     plen = sizeof( SocketAddrData );
-//	pBuf = (void* )malloc(1024);	//设网口帧数据最大不会超过150
+	pBuf = (void* )malloc(1024);		//设网口帧数据最大不会超过1024字节
 
 	UdpRecvLen = recvncfrom( s, (void **)&pBuf, MSG_WAITALL, (PSA)&SocketAddrData, &plen, &hBuffer );
 
@@ -247,52 +128,22 @@ int UdpFunc( SOCKET s, UINT32 unused )
 	if(*((char*)pBuf) == COMMUNICATION_CHECK)
 	{
 		sendto(s, pBuf, UdpRecvLen, MSG_WAITALL, (PSA)&SocketAddrData, plen);
+		System_printf("建立通信\n");
 	}
 	//----工作使能----
 	else if(*((char*)pBuf) == WORK_ENABLE)
 	{
 //		Msg0To1Ptr->FrameId = WORK_ENABLE;
-//		/* Send message to core 2. */
-//		status = MessageQ_put(QueueIdCore0ToCore1, &(Msg0To1Ptr->header));
-//		if (status < 0)
-//		{
-//			System_abort("MessageQ_put had a failure/error\n");
-//		}
-//		/* Notify CORE1 to receive message. */
-//		status = Notify_sendEvent(PROC_ID_CORE1, LINE_ID_CORE0_CORE1, EVENT_ID_CORE0_CORE1, WORK_ENABLE_NOTIFY, TRUE);
-//		if (status < 0)
-//		{
-//			System_printf("Notify_sendEvent had a failure/error, error code is %d \n", status);
-//			System_abort(" ");
-//		}
-//		sendto(s, pBuf, UdpRecvLen, MSG_WAITALL, (PSA)&SocketAddrData, plen);
 	}
 	//----系统休眠----
 	else if(*((char*)pBuf) == SLEEP_ENABLE)
 	{
 //		Msg0To1Ptr->FrameId = SLEEP_ENABLE;
-//		/* Send message to core 2. */
-//		status = MessageQ_put(QueueIdCore0ToCore1, &(Msg0To1Ptr->header));
-//		if (status < 0)
-//		{
-//			System_abort("MessageQ_put had a failure/error\n");
-//		}
-//		/* Notify CORE1 to receive message. */
-//		status = Notify_sendEvent(PROC_ID_CORE1, LINE_ID_CORE0_CORE1, EVENT_ID_CORE0_CORE1, SLEEP_ENABLE_NOTIFY, TRUE);
-//		if (status < 0)
-//		{
-//			System_printf("Notify_sendEvent had a failure/error, error code is %d \n", status);
-//			System_abort(" ");
-//		}
-//		sendto(s, pBuf, UdpRecvLen, MSG_WAITALL, (PSA)&SocketAddrData, plen);
 	}
 	//----导入散射点----
 	else if(*((char*)pBuf) == SCATTERING_POINT_INPUT)
 	{
 		ScatteringPointUdpFrame* ScatteringPointUdpFramePtr = (ScatteringPointUdpFrame*)malloc(sizeof(ScatteringPointUdpFrame));
-//		memcpy(ScatteringPointUdpFramePtr, pBuf, 8);
-//		int size = ScatteringPointUdpFramePtr->ScatteringPointData.PointNum;
-//		memcpy(ScatteringPointUdpFramePtr, pBuf, sizeof(ScatteringPointUdpFrame));	//不这样操作会在读取时出问题，可能是因为cache
 		memcpy(ScatteringPointUdpFramePtr, pBuf, 100);	//不这样操作会在读取时出问题，可能是因为cache
 
 		memcpy(	ScatteringPointPtr,
@@ -307,42 +158,44 @@ int UdpFunc( SOCKET s, UINT32 unused )
 		sendto(s, &success, sizeof(char), MSG_WAITALL, (PSA)&SocketAddrData, plen);
 
 		free(ScatteringPointUdpFramePtr);
+
+		System_printf("导入散射点\n");
 	}
 	//----工作参数设置----
 	else if(*((char*)pBuf) == WORK_PARAM_SET)
 	{
 		WorkParamUdpFrame* WorkParamUdpFramePtr = (WorkParamUdpFrame*)malloc(sizeof(WorkParamUdpFrame));
 		memcpy(WorkParamUdpFramePtr, pBuf, sizeof(WorkParamUdpFrame));	//不这样操作会在读取时出问题，可能是因为cache
-
+		MessageQ_setMsgId(&(Msg0To2Ptr->header), MsgID++);
 
 		/* 提取目标参数 */
 		//点目标
 		if((WorkParamUdpFramePtr->TargetFrameId&0x0000ffff) == POINT_TARGET)
 		{
-			Msg0To2Ptr->TargetFrameId = WorkParamUdpFramePtr->FrameId;
+			Msg0To2Ptr->TargetFrameId = WorkParamUdpFramePtr->TargetFrameId;
 			memcpy(&(Msg0To2Ptr->TargetParam), &(WorkParamUdpFramePtr->TargetFrame), sizeof(PointTargetParam));
-//			TargetParamSize = sizeof(PointTargetParam);
+			System_printf("POINT_TARGET\n");
 		}
 		//扩展目标,参数0
 		else if((WorkParamUdpFramePtr->TargetFrameId&0x0000ffff) == RANGE_SPREAD_TARGET_0)
 		{
-			Msg0To2Ptr->TargetFrameId = WorkParamUdpFramePtr->FrameId;
+			Msg0To2Ptr->TargetFrameId = WorkParamUdpFramePtr->TargetFrameId;
 			memcpy(&(Msg0To2Ptr->TargetParam), &(WorkParamUdpFramePtr->TargetFrame), sizeof(RangeSpreadTargetParam0));
-//			TargetParamSize = sizeof(RangeSpreadTargetParam0);
+			System_printf("RANGE_SPREAD_TARGET_0\n");
 		}
 		//扩展目标,参数1
 		else if((WorkParamUdpFramePtr->TargetFrameId&0x0000ffff) == RANGE_SPREAD_TARGET_1)
 		{
-			Msg0To2Ptr->TargetFrameId = WorkParamUdpFramePtr->FrameId;
+			Msg0To2Ptr->TargetFrameId = WorkParamUdpFramePtr->TargetFrameId;
 			memcpy(&(Msg0To2Ptr->TargetParam), &(WorkParamUdpFramePtr->TargetFrame), sizeof(RangeSpreadTargetParam1));
-//			TargetParamSize = sizeof(RangeSpreadTargetParam1);
+			System_printf("RANGE_SPREAD_TARGET_1\n");
 		}
 		//扩展目标,参数2
 		else if((WorkParamUdpFramePtr->TargetFrameId&0x0000ffff) == RANGE_SPREAD_TARGET_2)
 		{
-			Msg0To2Ptr->TargetFrameId = WorkParamUdpFramePtr->FrameId;
+			Msg0To2Ptr->TargetFrameId = WorkParamUdpFramePtr->TargetFrameId;
 			memcpy(&(Msg0To2Ptr->TargetParam), &(WorkParamUdpFramePtr->TargetFrame), sizeof(RangeSpreadTargetParam2));
-//			TargetParamSize = sizeof(RangeSpreadTargetParam2);
+			System_printf("RANGE_SPREAD_TARGET_2\n");
 		}
 
 		//发送噪声功率
@@ -354,6 +207,7 @@ int UdpFunc( SOCKET s, UINT32 unused )
 		{
 			System_abort("MessageQ_put had a failure/error\n");
 		}
+		System_printf("MessageQ_put(QueueIdCore0ToCore2, &(Msg0To2Ptr->header))\n");
 
 
 		/* 提取干扰参数  */
@@ -391,6 +245,7 @@ int UdpFunc( SOCKET s, UINT32 unused )
 			System_printf("Notify_sendEvent had a failure/error, error code is %d \n", status);
 			System_abort(" ");
 		}
+		System_printf("Notify_sendEvent(PROC_ID_CORE1, LINE_ID_CORE0_CORE1, EVENT_ID_CORE0_CORE1, WORK_PARAM_SET_NOTIFY, TRUE)\n");
 
 		/* 需要回传数据  */
 		if(((*((char*)pBuf + 1) >> 16) == MANUAL_MODE)||((*((char*)pBuf + 1) >> 16) == AUTO_MODE_PASS_BACK))
@@ -398,34 +253,38 @@ int UdpFunc( SOCKET s, UINT32 unused )
 			WorkParamSetBack		WorkParamSetBackFrame;
 
 			//点目标
-			if((WorkParamUdpFramePtr->TargetFrameId&0x0f) == POINT_TARGET)
+			if((WorkParamUdpFramePtr->TargetFrameId&0x0000ffff) == POINT_TARGET)
 			{
-				WorkParamSetBackFrame.TargetFrameId = WorkParamUdpFramePtr->FrameId;
+				WorkParamSetBackFrame.TargetFrameId = WorkParamUdpFramePtr->TargetFrameId;
 				WorkParamSetBackFrame.TargetParamBack.PointTargetBack = 0x01;
+				System_printf("POINT_TARGET\n");
 			}
 			//扩展目标,参数0
 			else if((WorkParamUdpFramePtr->TargetFrameId&0x0000ffff) == RANGE_SPREAD_TARGET_0)
 			{
 				//等待接收回传
 				while(MessageQ_get(MessageQCore2ToCore0, (MessageQ_Msg *)&Msg2To0Ptr, MessageQ_FOREVER) != 0);
-				WorkParamSetBackFrame.TargetFrameId = WorkParamUdpFramePtr->FrameId;
+				WorkParamSetBackFrame.TargetFrameId = WorkParamUdpFramePtr->TargetFrameId;
 				WorkParamSetBackFrame.TargetParamBack.RangeSpreadTargetParam0SetBackFrame = Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam0SetBackFrame;
+				System_printf("POINT_TARGET\n");
 			}
 			//扩展目标,参数1
 			else if((WorkParamUdpFramePtr->TargetFrameId&0x0000ffff) == RANGE_SPREAD_TARGET_1)
 			{
 				//等待接收回传
 				while(MessageQ_get(MessageQCore2ToCore0, (MessageQ_Msg *)&Msg2To0Ptr, MessageQ_FOREVER) != 0);
-				WorkParamSetBackFrame.TargetFrameId = WorkParamUdpFramePtr->FrameId;
+				WorkParamSetBackFrame.TargetFrameId = WorkParamUdpFramePtr->TargetFrameId;
 				WorkParamSetBackFrame.TargetParamBack.RangeSpreadTargetParam12SetBackFrame = Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame;
+				System_printf("RANGE_SPREAD_TARGET_1\n");
 			}
 			//扩展目标,参数2
 			else if((WorkParamUdpFramePtr->TargetFrameId&0x0000ffff) == RANGE_SPREAD_TARGET_2)
 			{
 				//等待接收回传
 				while(MessageQ_get(MessageQCore2ToCore0, (MessageQ_Msg *)&Msg2To0Ptr, MessageQ_FOREVER) != 0);
-				WorkParamSetBackFrame.TargetFrameId = WorkParamUdpFramePtr->FrameId;
+				WorkParamSetBackFrame.TargetFrameId = WorkParamUdpFramePtr->TargetFrameId;
 				WorkParamSetBackFrame.TargetParamBack.RangeSpreadTargetParam12SetBackFrame = Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame;
+				System_printf("RANGE_SPREAD_TARGET_2\n");
 			}
 
 			//无干扰
@@ -455,94 +314,9 @@ int UdpFunc( SOCKET s, UINT32 unused )
 		}
 
 		free(WorkParamUdpFramePtr);
+		System_printf("工作参数设置\n");
 	}
 
-
-
-
-//	if(status >= 0) //If receive new data, update UdpFrameRecv
-//	{
-//		memcpy(&UdpFrameRecv, pBuf, sizeof(UdpFrame));
-//	}
-//	//sendto( s, &UdpFrameRecv, sizeof(MnualModeFrame), 0, (PSA)&SocketAddrData, sizeof(SocketAddrData) );
-//
-//	/* Calculate some value that need no Reyleigh amplitude */
-//	DistanceDelayCal(&UdpFrameRecv, Msg0To1Ptr);
-//	Msg0To1Ptr->DopplerFrePinc = DopplerFrePincCal(UdpFrameRecv.TargetSpeed);
-//	AmplitudeCal(UdpFrameRecv.ScatteringPointPowerX, UdpFrameRecv.ScatteringPointPowerY, UdpFrameRecv.ScatteringPointPowerZ,
-//				Msg0To1Ptr->ScatteringPointAmplitude, ScatteringPointAmplitudeY, ScatteringPointAmplitudeZ);
-//
-//	/* Calculate angle deviation caused by amplitude of each scattering point.
-//	 * Change the target angle according to the angle deviation */
-//	LineDeviationTheta = LineDeviationCal(&UdpFrameRecv, ScatteringPointAmplitudeY, ScatteringPointAmplitudeZ, THETA);
-//	LineDeviationPhi = LineDeviationCal(&UdpFrameRecv, ScatteringPointAmplitudeY, ScatteringPointAmplitudeZ, PHI);
-//	AngleDeviationTheta = LineDeviationTheta / UdpFrameRecv.TargetReceiveDistance;
-//	AngleDeviationPhi = LineDeviationPhi / UdpFrameRecv.TargetReceiveDistance;
-//	Msg0To2Ptr->TargetAngleTheta = UdpFrameRecv.TargetAngleTheta + AngleDeviationTheta;
-//	Msg0To2Ptr->TargetAnglePhi   = UdpFrameRecv.TargetAnglePhi + AngleDeviationPhi;
-//	memcpy(Msg0To3Ptr, Msg0To2Ptr, sizeof(MsgCore0ToCore23456));
-//	memcpy(Msg0To4Ptr, Msg0To2Ptr, sizeof(MsgCore0ToCore23456));
-//	memcpy(Msg0To5Ptr, Msg0To2Ptr, sizeof(MsgCore0ToCore23456));
-//	memcpy(Msg0To6Ptr, Msg0To2Ptr, sizeof(MsgCore0ToCore23456));
-//
-//	/* Set message ID */
-//	MessageQ_setMsgId(&(Msg0To1Ptr->header), ManualMsgID);
-//	MessageQ_setMsgId(&(Msg0To2Ptr->header), ManualMsgID);
-//	MessageQ_setMsgId(&(Msg0To3Ptr->header), ManualMsgID);
-//	MessageQ_setMsgId(&(Msg0To4Ptr->header), ManualMsgID);
-//	MessageQ_setMsgId(&(Msg0To5Ptr->header), ManualMsgID);
-//	MessageQ_setMsgId(&(Msg0To6Ptr->header), ManualMsgID);
-//	System_printf("Msg ID is %d \n", ManualMsgID);
-//	ManualMsgID++;
-//
-//	/*------------------- Send message to CORE1 -------------------------------*/
-//	status = MessageQ_put(QueueIdCore0ToCore1, &(Msg0To1Ptr->header));
-//	if (status < 0)
-//	{
-//	   System_abort("MessageQ_put had a failure/error\n");
-//	}
-//
-//	/*--------------------- Send data to CORE2 ~ CORE6 -----------------------*/
-//	//To Core2
-//	status = MessageQ_put(QueueIdCore0ToCore2, &(Msg0To2Ptr->header));
-//	if (status < 0)
-//	{
-//	   System_abort("MessageQ_put had a failure/error\n");
-//	}
-//	//To Core3
-//	status = MessageQ_put(QueueIdCore0ToCore3, &(Msg0To3Ptr->header));
-//	if (status < 0)
-//	{
-//	   System_abort("MessageQ_put had a failure/error\n");
-//	}
-//	//To Core4
-//	status = MessageQ_put(QueueIdCore0ToCore4, &(Msg0To4Ptr->header));
-//	if (status < 0)
-//	{
-//	   System_abort("MessageQ_put had a failure/error\n");
-//	}
-//	//To Core5
-//	status = MessageQ_put(QueueIdCore0ToCore5, &(Msg0To5Ptr->header));
-//	if (status < 0)
-//	{
-//	   System_abort("MessageQ_put had a failure/error\n");
-//	}
-//	//To Core6
-//	status = MessageQ_put(QueueIdCore0ToCore6, &(Msg0To6Ptr->header));
-//	if (status < 0)
-//	{
-//	   System_abort("MessageQ_put had a failure/error\n");
-//	}
-//	/* Notify CORE1 to receive message from other cores */
-//	status = Notify_sendEvent(PROC_ID_CORE1, LINE_ID_CORE0_CORE1, EVENT_ID_CORE0_CORE1, MANUAL_MSG_RDY_NOTIFY, TRUE);
-//	if (status < 0)
-//	{
-//		System_printf("Notify_sendEvent had a failure/error, error code is %d \n", status);
-//		System_abort(" ");
-//	}
-
-    // Since the socket is still open, return "1"
-    // (we need TimeOut leave UDP sockets open)
     return(1);
 }
 

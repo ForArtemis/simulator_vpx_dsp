@@ -130,15 +130,15 @@
 #define	WORK_PARAM_SET			6
 
 /* Target param bit31:16 */
-#define	MANUAL_MODE				0x0000
-#define	AUTO_MODE_PASS_BACK		0x0001
-#define	AUTO_MODE_NO_PASS_BACK	0x0002
+#define	MANUAL_MODE				0
+#define	AUTO_MODE_PASS_BACK		1
+#define	AUTO_MODE_NO_PASS_BACK	2
 
 /* Target param bit15:0 */
-#define	POINT_TARGET			0x0000
-#define	RANGE_SPREAD_TARGET_0	0x0001
-#define	RANGE_SPREAD_TARGET_1	0x0002
-#define	RANGE_SPREAD_TARGET_2	0x0003
+#define	POINT_TARGET			0
+#define	RANGE_SPREAD_TARGET_0	1
+#define	RANGE_SPREAD_TARGET_1	2
+#define	RANGE_SPREAD_TARGET_2	3
 
 /* Jamming param */
 #define	NO_JAMMING				0x00000000

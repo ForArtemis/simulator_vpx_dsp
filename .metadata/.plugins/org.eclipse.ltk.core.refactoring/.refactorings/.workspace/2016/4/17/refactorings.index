@@ -2,3 +2,6 @@
 1461120575860	Rename resource 'simulator_vpx_DSP1_V0_1_6_core1'
 1461120582120	Rename resource 'simulator_vpx_DSP1_V0_1_6_core2'
 1461120587153	Rename resource 'simulator_vpx_DSP1_V0_1_6_core34567'
+1461150654253	Delete resource 'simulator_vpx_DSP1_core1/MessageQ.c'
+1461151055080	Delete resource 'simulator_vpx_DSP1_core1/MessageQ.c'
+1461151767160	Delete resource 'simulator_vpx_DSP1_core1/MessageQ.c'

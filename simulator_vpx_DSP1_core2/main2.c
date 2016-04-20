@@ -72,9 +72,6 @@ ScatteringPoint		*ScatteringPointPtr;
 /* Call back function of notify from CORE0 */
 void NotifyCore0CbFxn(UInt16 procId, UInt16 lineId, UInt32 eventId, UArg arg, UInt32 payload)
 {
-//	SharedRegion_SRPtr ScatteringPointSrPtr;
-//	ScatteringPointSrPtr = payload;
-//	ScatteringPointPtr = SharedRegion_getPtr(ScatteringPointSrPtr);
 	ScatteringPointPtr = (ScatteringPoint*)payload;
 }
 
@@ -310,6 +307,7 @@ void MainThread()
 
 		ManualMsgID = Msg0To2Ptr->header.msgId;
 
+		MessageQ_setMsgId(&(Msg2To1Ptr->header), ManualMsgID);
 		MessageQ_setMsgId(&(Msg2To3Ptr->header), ManualMsgID);
 		MessageQ_setMsgId(&(Msg2To4Ptr->header), ManualMsgID);
 		MessageQ_setMsgId(&(Msg2To5Ptr->header), ManualMsgID);
@@ -317,12 +315,13 @@ void MainThread()
 		MessageQ_setMsgId(&(Msg2To7Ptr->header), ManualMsgID);
 
 		//点目标
-		if((Msg0To2Ptr->TargetFrameId) & 0xffff == POINT_TARGET)
+		if(((Msg0To2Ptr->TargetFrameId) & 0x0000ffff) == POINT_TARGET)
 		{
 			PointTargetCal(Msg0To2Ptr, Msg2To1Ptr, Msg2To3Ptr);
+			System_printf("POINT_TARGET\n");
 		}
 		//扩展目标，参数0
-		else if((Msg0To2Ptr->TargetFrameId) & 0xffff == RANGE_SPREAD_TARGET_0)
+		else if(((Msg0To2Ptr->TargetFrameId) & 0x0000ffff) == RANGE_SPREAD_TARGET_0)
 		{
 			RangeSpreadTargetParam0Cal(Msg0To2Ptr, Msg2To1Ptr, Msg2To3Ptr, Msg2To0Ptr, ScatteringPointPtr);
 			//回传数据
@@ -331,9 +330,10 @@ void MainThread()
 			{
 				System_abort("MessageQ_put had a failure/error\n");
 			}
+			System_printf("RANGE_SPREAD_TARGET_0\n");
 		}
 		//扩展目标，参数1
-		else if((Msg0To2Ptr->TargetFrameId) & 0xffff == RANGE_SPREAD_TARGET_1)
+		else if(((Msg0To2Ptr->TargetFrameId) & 0x0000ffff) == RANGE_SPREAD_TARGET_1)
 		{
 			RangeSpreadTargetParam1Cal(Msg0To2Ptr, Msg2To1Ptr, Msg2To3Ptr, Msg2To0Ptr, ScatteringPointPtr);
 			//回传数据
@@ -342,9 +342,10 @@ void MainThread()
 			{
 				System_abort("MessageQ_put had a failure/error\n");
 			}
+			System_printf("RANGE_SPREAD_TARGET_1\n");
 		}
 		//扩展目标，参数2
-		else if((Msg0To2Ptr->TargetFrameId) & 0xffff == RANGE_SPREAD_TARGET_2)
+		else if(((Msg0To2Ptr->TargetFrameId) & 0x0000ffff) == RANGE_SPREAD_TARGET_2)
 		{
 			RangeSpreadTargetParam2Cal(Msg0To2Ptr, Msg2To1Ptr, Msg2To3Ptr, Msg2To0Ptr, ScatteringPointPtr);
 			//回传数据
@@ -353,6 +354,7 @@ void MainThread()
 			{
 				System_abort("MessageQ_put had a failure/error\n");
 			}
+			System_printf("RANGE_SPREAD_TARGET_2\n");
 		}
 
 		//给core4~7的msg和3相同
@@ -394,6 +396,8 @@ void MainThread()
 		{
 			System_abort("MessageQ_put had a failure/error\n");
 		}
+
+		System_printf("MessageQ_put\n");
 	}
 }
 
