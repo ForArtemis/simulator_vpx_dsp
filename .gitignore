@@ -42,6 +42,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-#不包括Debug文件夹中内容
+#不包括CCS生成的内容
 ./*/Debug
+./*/.config
+./*/.launches
+./*/.settings
+
 
