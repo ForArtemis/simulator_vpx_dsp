@@ -43,9 +43,9 @@ Temporary Items
 .apdisk
 
 #不包括CCS生成的内容
-./*/Debug
-./*/.config
-./*/.launches
-./*/.settings
+Debug/
+.config/
+.launches/
+.settings/
 
 
