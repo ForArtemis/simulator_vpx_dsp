@@ -1,0 +1,46 @@
+!SESSION 2016-04-20 10:46:29.595 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_13
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=zh_CN
+Framework arguments:  s-startup plugins/org.eclipse.equinox.launcher_1.2.0.v20110502.jar -product com.ti.ccstudio.branding.product
+Command-line arguments:  -os win32 -ws win32 -arch x86 s-startup plugins/org.eclipse.equinox.launcher_1.2.0.v20110502.jar -product com.ti.ccstudio.branding.product
+
+!ENTRY org.eclipse.ui 4 4 2016-04-20 10:46:51.962
+!MESSAGE Referenced part does not exist yet: org.eclipse.cdt.ui.CView.
+
+!ENTRY com.ti.gde.adapter.c6flo 1 0 2016-04-20 10:47:25.254
+!MESSAGE install directory: D:\ti\ccsv5\eclipse
+
+!ENTRY com.ti.gde.adapter.c6flo 1 0 2016-04-20 10:47:25.254
+!MESSAGE blocksDirectory directory: D:\ti\ccsv5\ccs_base\c6flo_1.0.0.201206032146\Blocks
+
+!ENTRY com.ti.gde.adapter.c6flo 1 0 2016-04-20 10:47:25.287
+!MESSAGE xdcToolLocation directory: D:/ti/xdctools_3_25_03_72
+
+!ENTRY com.ti.gde.diagram 1 0 2016-04-20 10:47:25.287
+!MESSAGE GDE adapter found: com.ti.gde.adapter.c6flo.C6floAdapter   Supporting extensions: [c6flo] PluginID=com.ti.gde.adapter.c6flo
+
+!ENTRY org.eclipse.osgi 2 1 2016-04-20 10:49:17.447
+!MESSAGE NLS missing message: MemoryDumper_dialog_invalidHeaderError in: com.ti.ccstudio.debug.ui.CCSDebugUIMessages
+
+!ENTRY org.eclipse.cdt.core 1 0 2016-04-20 10:49:28.382
+!MESSAGE Indexed 'simulator_vpx_DSP1_V0_1_6_core1' (25 sources, 333 headers) in 14.88 sec: 41,469 declarations; 108,558 references; 4 unresolved inclusions; 6 syntax errors; 1,352 unresolved names (0.89%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2016-04-20 10:49:31.589
+!MESSAGE Indexed 'simulator_vpx_DSP1_V0_1_6_core2' (6 sources, 215 headers) in 3.20 sec: 28,475 declarations; 58,388 references; 4 unresolved inclusions; 1 syntax errors; 1,250 unresolved names (1.42%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2016-04-20 10:49:35.859
+!MESSAGE Indexed 'simulator_vpx_DSP1_V0_1_6_core34567' (5 sources, 213 headers) in 3.22 sec: 27,936 declarations; 55,684 references; 4 unresolved inclusions; 1 syntax errors; 1,242 unresolved names (1.46%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2016-04-20 10:49:41.786
+!MESSAGE Indexed 'simulator_vpx_DSP1_core0' (18 sources, 401 headers) in 5.92 sec: 39,990 declarations; 90,171 references; 4 unresolved inclusions; 5 syntax errors; 1,651 unresolved names (1.25%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2016-04-20 10:49:52.718
+!MESSAGE Indexed 'simulator_vpx_DSP1_core1' (25 sources, 333 headers) in 10.92 sec: 41,469 declarations; 108,558 references; 4 unresolved inclusions; 6 syntax errors; 1,352 unresolved names (0.89%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2016-04-20 10:49:55.571
+!MESSAGE Indexed 'simulator_vpx_DSP1_core2' (6 sources, 215 headers) in 2.85 sec: 28,475 declarations; 58,388 references; 4 unresolved inclusions; 1 syntax errors; 1,250 unresolved names (1.42%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2016-04-20 10:49:58.646
+!MESSAGE Indexed 'simulator_vpx_DSP1_core34567' (5 sources, 213 headers) in 3.07 sec: 27,936 declarations; 55,684 references; 4 unresolved inclusions; 1 syntax errors; 1,242 unresolved names (1.46%)
