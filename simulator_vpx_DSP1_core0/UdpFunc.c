@@ -144,7 +144,7 @@ int UdpFunc( SOCKET s, UINT32 unused )
 	else if(*((char*)pBuf) == SCATTERING_POINT_INPUT)
 	{
 		ScatteringPointUdpFrame* ScatteringPointUdpFramePtr = (ScatteringPointUdpFrame*)malloc(sizeof(ScatteringPointUdpFrame));
-		memcpy(ScatteringPointUdpFramePtr, pBuf, 100);	//不这样操作会在读取时出问题，可能是因为cache
+		memcpy(ScatteringPointUdpFramePtr, pBuf, sizeof(ScatteringPointUdpFrame));	//不这样操作会在读取时出问题，可能是因为cache
 
 		memcpy(	ScatteringPointPtr,
 				&(ScatteringPointUdpFramePtr->ScatteringPointData),
@@ -252,6 +252,7 @@ int UdpFunc( SOCKET s, UINT32 unused )
 		{
 			WorkParamSetBack		WorkParamSetBackFrame;
 
+			WorkParamSetBackFrame.FrameId = WorkParamUdpFramePtr->FrameId;
 			//点目标
 			if((WorkParamUdpFramePtr->TargetFrameId&0x0000ffff) == POINT_TARGET)
 			{

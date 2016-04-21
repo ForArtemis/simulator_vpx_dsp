@@ -99,7 +99,7 @@ void LineDeviationCal(
 	RelativeAmp = (float*)malloc(sizeof(float) * ScatteringPointNum);
 	for(i = 0 ; i < ScatteringPointNum ; ++i)
 	{
-		RelativeAmp[i] = sqrt(PointSight[i].RCS);
+		RelativeAmp[i] = sqrt(ScatteringPointPtr->PointData[i].RCS);
 	}
 
 
@@ -194,6 +194,10 @@ void RangeSpreadTargetParam0Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 								ScatteringPoint *ScatteringPointPtr)
 {
 	int i;
+	//发射与接收距离
+	int	R1 = Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetDistanceTran;
+	int	R2 = Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetDistanceRecv;
+
 	//视线坐标系下点信息
 	Point PointSight[1024];
 	for(i = 0 ; i < ScatteringPointPtr->PointNum ; ++i)
@@ -218,21 +222,21 @@ void RangeSpreadTargetParam0Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 	}
 	for(i = 0 ; i < ScatteringPointPtr->PointNum ; ++i)
 	{
-		float	temp = sqrt((PointSight[i].X)*(PointSight[i].X) +
-						(PointSight[i].Y)*(PointSight[i].Y) +
-						(PointSight[i].Z)*(PointSight[i].Z));
+		//计算弹目距离，PointSight[i].X + R1需要大于0
+		float	temp = sqrt(pow(PointSight[i].X + R1, 2) +
+							pow(PointSight[i].Y, 2) +
+							pow(PointSight[i].Z, 2));
+		temp -= R1;	//一维距离像，原点为目标所在位置
 		int		PositionTemp;
-		if(PointSight[i].X > 0)
-			PositionTemp = temp / (LIGHT_SPEED/FPGA_CLK_FRE/2);
-		else
-			PositionTemp = - temp / (LIGHT_SPEED/FPGA_CLK_FRE/2);
+		PositionTemp = temp / (LIGHT_SPEED/FPGA_CLK_FRE/2);
+//		if(PointSight[i].X > 0)
+//			PositionTemp = temp / (LIGHT_SPEED/FPGA_CLK_FRE/2);
+//		else
+//			PositionTemp = - temp / (LIGHT_SPEED/FPGA_CLK_FRE/2);
 		PositionTemp += RANGE_PROFILE_NUM/2;	//使RANGE_PROFILE_NUM/2为0位置
-		Msg2To1Ptr->RangeProfile[PositionTemp] += PointSight[i].RCS;
+		Msg2To1Ptr->RangeProfile[PositionTemp] += ScatteringPointPtr->PointData[i].RCS;
 	}
 
-	//发射与接收距离
-	int	R1 = Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetDistanceTran;
-	int	R2 = Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetDistanceRecv;
 
 	//用功率计算幅度
 	for(i = 0 ; i < RANGE_PROFILE_NUM ; ++i)
@@ -415,7 +419,7 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 										pow(GroundCoordTargetY + PointGround[i].Y - GroundCoordRadarRecvY, 2) +
 										pow(GroundCoordTargetZ + PointGround[i].Z - GroundCoordRadarRecvZ, 2));
 		Msg2To1Ptr->RangeProfile[(int)((TranRangeTemp + RecvRangeTemp - TranR - RecvR) / (LIGHT_SPEED/FPGA_CLK_FRE/2) + RANGE_PROFILE_NUM/2)]
-		                         	 += PointSight[i].RCS;
+		                         	 += ScatteringPointPtr->PointData[i].RCS;
 	}
 	//用功率计算幅度
 	for(i = 0 ; i < RANGE_PROFILE_NUM ; ++i)

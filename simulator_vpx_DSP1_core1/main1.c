@@ -923,45 +923,34 @@ Void MainThread(void)
     	else if(NotifyCore0Payload == WORK_PARAM_SET_NOTIFY)
     	{
     		status = MessageQ_get(MessageQCore2ToCore1, (MessageQ_Msg*)&Msg2To1Ptr, MessageQ_FOREVER);
-//    		status = MessageQ_get(MessageQCore2ToCore1, (MessageQ_Msg*)&Msg2To1Ptr, 1000);
     		System_printf("MessageQ_get() MessageQCore2ToCore1, %d. \n", Msg2To1Ptr->header.msgId);
     		if(status < 0)
     			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
     		/*------------------- CORE3~7 ----------------------*/
-//			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg3To1Ptr, MessageQ_FOREVER);
-//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg3To1Ptr, 1000);
     		status = MessageQ_get(MessageQCore3ToCore1, (MessageQ_Msg*)&Msg3To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg3To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg3To1Ptr->header.msgId);
-//    		if(status < 0)
-//    			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
+    		if(status < 0)
+    			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
 
-//			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg4To1Ptr, MessageQ_FOREVER);
-//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg4To1Ptr, 1000);
     		status = MessageQ_get(MessageQCore4ToCore1, (MessageQ_Msg*)&Msg4To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg4To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg4To1Ptr->header.msgId);
     		if(status < 0)
     			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
 
-//			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg5To1Ptr, MessageQ_FOREVER);
-//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg5To1Ptr, 1000);
     		status = MessageQ_get(MessageQCore5ToCore1, (MessageQ_Msg*)&Msg5To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg5To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg5To1Ptr->header.msgId);
     		if(status < 0)
     			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
 
-//			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg6To1Ptr, MessageQ_FOREVER);
-//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg6To1Ptr, 1000);
     		status = MessageQ_get(MessageQCore6ToCore1, (MessageQ_Msg*)&Msg6To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg6To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg6To1Ptr->header.msgId);
     		if(status < 0)
     			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
 
-//			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg7To1Ptr, MessageQ_FOREVER);
-//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg7To1Ptr, 1000);
     		status = MessageQ_get(MessageQCore7ToCore1, (MessageQ_Msg*)&Msg7To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg7To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg7To1Ptr->header.msgId);

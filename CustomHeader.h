@@ -416,10 +416,10 @@ typedef struct
 /* 散射点结构体 */
 typedef struct
 {
-	float	RCS;
 	float	X;
 	float	Y;
 	float	Z;
+	float	RCS;
 }Point;
 
 typedef struct
