@@ -336,8 +336,8 @@ void IPC_init()
 	{
 		System_printf("HeapBufMP_create for CORE0 finished. \n");
 	}
-	/* Register this heap with MessageQ */
-	status = MessageQ_registerHeap((IHeap_Handle)heapHandle, HEAP_ID_CORE0_CORE1);
+//	/* Register this heap with MessageQ */
+//	status = MessageQ_registerHeap((IHeap_Handle)heapHandle, HEAP_ID_CORE0_CORE1);
 	/* Create the local message queue */
 	MessageQCore0ToCore1 = MessageQ_create(MSGQ_NAME_CORE0_CORE1, NULL);
 	if (MessageQCore0ToCore1 == NULL)
@@ -363,8 +363,8 @@ void IPC_init()
 	{
 		System_printf("HeapBufMP_create for CORE2 finished. \n");
 	}
-	/* Register this heap with MessageQ */
-	status = MessageQ_registerHeap((IHeap_Handle)heapHandle, HEAP_ID_CORE2_CORE1);
+//	/* Register this heap with MessageQ */
+//	status = MessageQ_registerHeap((IHeap_Handle)heapHandle, HEAP_ID_CORE2_CORE1);
 	/* Create the local message queue */
 	MessageQCore2ToCore1 = MessageQ_create(MSGQ_NAME_CORE2_CORE1, NULL);
 	if (MessageQCore2ToCore1 == NULL)
@@ -379,20 +379,45 @@ void IPC_init()
 	HeapBufMP_Params_init(&heapBufParams);
 	heapBufParams.regionId       = 0;
 	heapBufParams.name           = HEAP_BUF_NAME_CORE34567_CORE1;
-	heapBufParams.numBlocks      = 5;	//5 cores
+	heapBufParams.numBlocks      = 10;	//5 cores，分配了双培的空间
 	heapBufParams.blockSize      = sizeof(MsgCore34567ToCore1);
 	heapHandle = HeapBufMP_create(&heapBufParams);
 	if (heapHandle == NULL)
 	{
 		System_abort("HeapBufMP_create failed\n" );
 	}
-	/* Register this heap with MessageQ */
-	status = MessageQ_registerHeap((IHeap_Handle)heapHandle, HEAP_ID_CORE34567_CORE1);
-	if(status < 0)
-		System_abort("??????????");
-	/* Create the local message queue */
-	MessageQCore34567ToCore1 = MessageQ_create(MSGQ_NAME_CORE34567_CORE1, NULL);
-	if (MessageQCore34567ToCore1 == NULL)
+//	/* Register this heap with MessageQ */
+//	status = MessageQ_registerHeap((IHeap_Handle)heapHandle, HEAP_ID_CORE34567_CORE1);
+//	if(status < 0)
+//		System_abort("??????????");
+//	/* Create the local message queue */
+//	MessageQCore34567ToCore1 = MessageQ_create(MSGQ_NAME_CORE34567_CORE1, NULL);
+//	if (MessageQCore34567ToCore1 == NULL)
+//	{
+//		System_abort("MessageQ_create34567 failed\n");
+//	}
+	MessageQCore3ToCore1 = MessageQ_create(MSGQ_NAME_CORE3_CORE1, NULL);
+	if (MessageQCore3ToCore1 == NULL)
+	{
+		System_abort("MessageQ_create34567 failed\n");
+	}
+	MessageQCore4ToCore1 = MessageQ_create(MSGQ_NAME_CORE4_CORE1, NULL);
+	if (MessageQCore4ToCore1 == NULL)
+	{
+		System_abort("MessageQ_create34567 failed\n");
+	}
+	MessageQCore5ToCore1 = MessageQ_create(MSGQ_NAME_CORE5_CORE1, NULL);
+	if (MessageQCore5ToCore1 == NULL)
+	{
+		System_abort("MessageQ_create34567 failed\n");
+	}
+	MessageQCore6ToCore1 = MessageQ_create(MSGQ_NAME_CORE6_CORE1, NULL);
+	if (MessageQCore6ToCore1 == NULL)
+	{
+		System_abort("MessageQ_create34567 failed\n");
+	}
+	MessageQCore7ToCore1 = MessageQ_create(MSGQ_NAME_CORE7_CORE1, NULL);
+	if (MessageQCore7ToCore1 == NULL)
 	{
 		System_abort("MessageQ_create34567 failed\n");
 	}
@@ -897,42 +922,47 @@ Void MainThread(void)
     	//接收到工作参数帧
     	else if(NotifyCore0Payload == WORK_PARAM_SET_NOTIFY)
     	{
-//    		status = MessageQ_get(MessageQCore2ToCore1, (MessageQ_Msg*)&Msg2To1Ptr, MessageQ_FOREVER);
-    		status = MessageQ_get(MessageQCore2ToCore1, (MessageQ_Msg*)&Msg2To1Ptr, 1000);
+    		status = MessageQ_get(MessageQCore2ToCore1, (MessageQ_Msg*)&Msg2To1Ptr, MessageQ_FOREVER);
+//    		status = MessageQ_get(MessageQCore2ToCore1, (MessageQ_Msg*)&Msg2To1Ptr, 1000);
     		System_printf("MessageQ_get() MessageQCore2ToCore1, %d. \n", Msg2To1Ptr->header.msgId);
     		if(status < 0)
     			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
-    		/*------------------- CORE2~5 ----------------------*/
+    		/*------------------- CORE3~7 ----------------------*/
 //			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg3To1Ptr, MessageQ_FOREVER);
-    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg3To1Ptr, 1000);
+//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg3To1Ptr, 1000);
+    		status = MessageQ_get(MessageQCore3ToCore1, (MessageQ_Msg*)&Msg3To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg3To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg3To1Ptr->header.msgId);
-    		if(status < 0)
-    			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
+//    		if(status < 0)
+//    			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
 
 //			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg4To1Ptr, MessageQ_FOREVER);
-    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg4To1Ptr, 1000);
+//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg4To1Ptr, 1000);
+    		status = MessageQ_get(MessageQCore4ToCore1, (MessageQ_Msg*)&Msg4To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg4To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg4To1Ptr->header.msgId);
     		if(status < 0)
     			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
 
 //			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg5To1Ptr, MessageQ_FOREVER);
-    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg5To1Ptr, 1000);
+//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg5To1Ptr, 1000);
+    		status = MessageQ_get(MessageQCore5ToCore1, (MessageQ_Msg*)&Msg5To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg5To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg5To1Ptr->header.msgId);
     		if(status < 0)
     			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
 
 //			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg6To1Ptr, MessageQ_FOREVER);
-    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg6To1Ptr, 1000);
+//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg6To1Ptr, 1000);
+    		status = MessageQ_get(MessageQCore6ToCore1, (MessageQ_Msg*)&Msg6To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg6To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg6To1Ptr->header.msgId);
     		if(status < 0)
     			System_printf("MessageQCore2ToCore1 status<0!!!!!!!!!!!!!!\n");
 
 //			status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg7To1Ptr, MessageQ_FOREVER);
-    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg7To1Ptr, 1000);
+//    		status = MessageQ_get(MessageQCore34567ToCore1, (MessageQ_Msg*)&Msg7To1Ptr, 1000);
+    		status = MessageQ_get(MessageQCore7ToCore1, (MessageQ_Msg*)&Msg7To1Ptr, MessageQ_FOREVER);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, CORE ID is %d. \n", Msg7To1Ptr->ProcId);
 			System_printf("MessageQ_get() MessageQCore23456ToCore1, MsgId is %d. \n", Msg7To1Ptr->header.msgId);
     		if(status < 0)
@@ -987,11 +1017,11 @@ Void MainThread(void)
 		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
 
 //		while((status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, (sizeof(Uint32) + sizeof(Uint16) + sizeof(Uint16) + sizeof(Uint16)*10), SrioSockInfo)) != 0) ;
-		if(status != 0)
-		{
-			System_printf("Error code is %d.\n", status);
-			System_printf("Srio_sockSend_DIO() error!!! \n");
-		}
+//		if(status != 0)
+//		{
+//			System_printf("Error code is %d.\n", status);
+//			System_printf("Srio_sockSend_DIO() error!!! \n");
+//		}
 
 		System_printf("Srio_sockSend_DIO(). \n");
     }

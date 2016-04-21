@@ -90,7 +90,8 @@ void OcrientationVectorCal(
 /* Initialize IPC and MessageQ */
 void IPC_init(
 		String 	HeapBufMPStringFromCore2,
-		String 	MessageQStringFromCore2
+		String 	MessageQStringFromCore2,
+		String	MessageQStringToCore1
 )
 {
 	Int status;
@@ -128,12 +129,14 @@ void IPC_init(
 	System_printf("MessageQ_registerHeap((IHeap_Handle)HeapHandleCore34567Core1, HEAP_ID_CORE34567_CORE1); \n");
 
 	do {
-		status = MessageQ_open(MSGQ_NAME_CORE34567_CORE1, &QueueIdCore34567ToCore1);
+//		status = MessageQ_open(MSGQ_NAME_CORE34567_CORE1, &QueueIdCore34567ToCore1);
+		status = MessageQ_open(MessageQStringToCore1, &QueueIdCore34567ToCore1);
 		Task_sleep(1) ;
 	} while (status < 0);
-	System_printf("MessageQ_open(MSGQ_NAME_CORE34567_CORE1, &QueueIdCore34567ToCore1); \n");
+	System_printf("MessageQ_open(MessageQStringToCore1, &QueueIdCore34567ToCore1); \n");
 
 	Msg34567To1Ptr = (MsgCore34567ToCore1*)MessageQ_alloc(HEAP_ID_CORE34567_CORE1, sizeof(MsgCore34567ToCore1));
+	Msg34567To1Ptr = (MsgCore34567ToCore1*)MessageQ_alloc(HEAP_ID_CORE34567_CORE1, sizeof(MsgCore34567ToCore1));	//不用第一次分配的空间，因为会有问题，不明
 	if (Msg34567To1Ptr == NULL)
 	{
 		System_abort("MessageQ_alloc failed\n" );
@@ -166,6 +169,7 @@ void MainThread()
 	int CoreNum;
 	String 	HeapBufMPStringFromCore2;
 	String 	MessageQStringFromCore2;
+	String	MessageQStringToCore1;
 
 
 	/* Read core number */
@@ -177,26 +181,31 @@ void MainThread()
 	{
 		HeapBufMPStringFromCore2 = HEAP_BUF_NAME_CORE2_CORE34567;
 		MessageQStringFromCore2  = MSGQ_NAME_CORE2_CORE3;
+		MessageQStringToCore1 = MSGQ_NAME_CORE3_CORE1;
 	}
 	else if(CoreNum == PROC_ID_CORE4)
 	{
 		HeapBufMPStringFromCore2 = HEAP_BUF_NAME_CORE2_CORE34567;
 		MessageQStringFromCore2  = MSGQ_NAME_CORE2_CORE4;
+		MessageQStringToCore1 = MSGQ_NAME_CORE4_CORE1;
 	}
 	else if(CoreNum == PROC_ID_CORE5)
 	{
 		HeapBufMPStringFromCore2 = HEAP_BUF_NAME_CORE2_CORE34567;
 		MessageQStringFromCore2  = MSGQ_NAME_CORE2_CORE5;
+		MessageQStringToCore1 = MSGQ_NAME_CORE5_CORE1;
 	}
 	else if(CoreNum == PROC_ID_CORE6)
 	{
 		HeapBufMPStringFromCore2 = HEAP_BUF_NAME_CORE2_CORE34567;
 		MessageQStringFromCore2  = MSGQ_NAME_CORE2_CORE6;
+		MessageQStringToCore1 = MSGQ_NAME_CORE6_CORE1;
 	}
 	else if(CoreNum == PROC_ID_CORE7)
 	{
 		HeapBufMPStringFromCore2 = HEAP_BUF_NAME_CORE2_CORE34567;
 		MessageQStringFromCore2  = MSGQ_NAME_CORE2_CORE7;
+		MessageQStringToCore1 = MSGQ_NAME_CORE7_CORE1;
 	}
 	else
 	{
@@ -215,7 +224,7 @@ void MainThread()
 	}
 
 	/* Initialize IPC and MessageQ */
-	IPC_init(HeapBufMPStringFromCore2, MessageQStringFromCore2);
+	IPC_init(HeapBufMPStringFromCore2, MessageQStringFromCore2, MessageQStringToCore1);
 
 	while(1)
 	{
@@ -236,17 +245,15 @@ void MainThread()
 				);
 		}
 
-		if((CoreNum == 7))
+
+		//send Message to CORE1
+		MessageQ_setMsgId(&(Msg34567To1Ptr->header), (Msg2To34567Ptr->header.msgId));
+		status = MessageQ_put(QueueIdCore34567ToCore1, &(Msg34567To1Ptr->header));
+		if (status < 0)
 		{
-			//send Message to CORE1
-			MessageQ_setMsgId(&(Msg34567To1Ptr->header), ((Msg2To34567Ptr->header.msgId) + 1) * CoreNum);
-			status = MessageQ_put(QueueIdCore34567ToCore1, &(Msg34567To1Ptr->header));
-			if (status < 0)
-			{
-			   System_abort("MessageQ_put had a failure/error\n");
-			}
-			System_printf("MessageQ_put\n");
+		   System_abort("MessageQ_put had a failure/error\n");
 		}
+		System_printf("MessageQ_put\n");
 	}
 }
 

@@ -57,6 +57,7 @@
 #define HEAP_ID_CORE2_CORE1			3
 #define HEAP_ID_CORE2_CORE34567		4
 #define HEAP_ID_CORE34567_CORE1		5
+#define HEAP_ID_CORE34_CORE1		6
 //heap bufµÄÃû×Ö
 #define	HEAP_BUF_NAME_CORE0_CORE1     "Core0ToCore1"
 #define	HEAP_BUF_NAME_CORE0_CORE2     "Core0ToCore2"
@@ -66,6 +67,7 @@
 #define	HEAP_BUF_NAME_CORE0_CORE6     "Core0ToCore6"
 #define	HEAP_BUF_NAME_CORE0_CORE7     "Core0ToCore7"
 #define	HEAP_BUF_NAME_CORE34567_CORE1 "Core34567ToCore1"
+#define	HEAP_BUF_NAME_CORE34_CORE1 	  "Core34ToCore1"
 #define	HEAP_BUF_NAME_CORE2_CORE34567 "Core2ToCore34567"
 #define	HEAP_BUF_NAME_CORE2_CORE0     "Core2ToCore0"
 #define	HEAP_BUF_NAME_CORE2_CORE1     "Core2ToCore1"
