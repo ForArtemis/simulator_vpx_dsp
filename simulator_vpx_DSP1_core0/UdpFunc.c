@@ -40,6 +40,8 @@
 #include <ti/ndk/inc/netmain.h>
 #include <string.h>
 
+#include <ti/csl/csl_cacheAux.h>
+
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/hal/Timer.h>
@@ -287,6 +289,8 @@ int UdpFunc( SOCKET s, UINT32 unused )
 				WorkParamSetBackFrame.TargetParamBack.RangeSpreadTargetParam12SetBackFrame = Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame;
 				System_printf("RANGE_SPREAD_TARGET_2\n");
 			}
+
+			CACHE_invL1d(Msg2To0Ptr, sizeof(MsgCore2ToCore0), CACHE_WAIT);	//从cache中invalid
 
 			//无干扰
 			if(WorkParamUdpFramePtr->JammingFrameId == NO_JAMMING)

@@ -6,6 +6,7 @@
 #include <ti/sysbios/heaps/HeapMem.h>
 #include <ti/csl/csl_ipcAux.h>
 #include <ti/csl/csl_chipAux.h>
+#include <ti/csl/csl_cacheAux.h>
 #include <xdc/runtime/System.h>
 #include <xdc/runtime/IHeap.h>
 
@@ -229,6 +230,7 @@ void MainThread()
 	while(1)
 	{
 		while(MessageQ_get(MessageQCore2ToCore34567, (MessageQ_Msg *)&Msg2To34567Ptr, MessageQ_FOREVER) != 0);
+		CACHE_invL1d(Msg2To34567Ptr, sizeof(MsgCore2ToCore34567), CACHE_WAIT);	//´ÓcacheÖÐinvalid
 
 		//Set Proc ID
 		Msg34567To1Ptr->ProcId = CoreNum;

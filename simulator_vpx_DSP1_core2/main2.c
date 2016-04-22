@@ -6,8 +6,10 @@
 #include <ti/sysbios/heaps/HeapMem.h>
 #include <ti/csl/csl_ipcAux.h>
 #include <ti/csl/csl_chipAux.h>
+#include <ti/csl/csl_cacheAux.h>
 #include <xdc/runtime/System.h>
 #include <xdc/runtime/IHeap.h>
+#include <xdc/runtime/Memory.h>
 
 #include <ti/ipc/GateMP.h>
 #include <ti/ipc/Ipc.h>
@@ -304,6 +306,9 @@ void MainThread()
 	{
 		//Waite message from core0.
 		while(MessageQ_get(MessageQCore0ToCore2, (MessageQ_Msg *)&Msg0To2Ptr, MessageQ_FOREVER) != 0);
+
+		CACHE_invL1d(Msg0To2Ptr, sizeof(MsgCore0ToCore2), CACHE_WAIT);	//从cache中invalid
+		CACHE_invL1d(ScatteringPointPtr, sizeof(ScatteringPoint), CACHE_WAIT);	//从cache中invalid
 
 		ManualMsgID = Msg0To2Ptr->header.msgId;
 

@@ -14,9 +14,9 @@ void CoordinateCalculateOriginToTrans(float OriginToTransAngleGamma, float Origi
 {
     float TransMatrix[3][3];
 
-    float OriginToTransAnglePhiRad = OriginToTransAnglePhi / 3.1415926 * 180;
-    float OriginToTransAngleThetaRad = OriginToTransAngleTheta / 3.1415926 * 180;
-    float OriginToTransAngleGammaRad = OriginToTransAngleGamma / 3.1415926 * 180;
+    float OriginToTransAnglePhiRad = OriginToTransAnglePhi / 180 * 3.1415926;
+    float OriginToTransAngleThetaRad = OriginToTransAngleTheta / 180 * 3.1415926;
+    float OriginToTransAngleGammaRad = OriginToTransAngleGamma / 180 * 3.1415926;
 
     float CosPhi = cos(OriginToTransAnglePhiRad);
     float SinPhi = sin(OriginToTransAnglePhiRad);
@@ -47,9 +47,9 @@ void CoordinateCalculateTransToOrigin(float TransToOriginAngleGamma, float Trans
 {
     float TransMatrix[3][3];
 
-    float TransToOriginAnglePhiRad = TransToOriginAnglePhi / 3.1415926 * 180;
-    float TransToOriginAngleThetaRad = TransToOriginAngleTheta / 3.1415926 * 180;
-    float TransToOriginAngleGammaRad = TransToOriginAngleGamma / 3.1415926 * 180;
+    float TransToOriginAnglePhiRad = TransToOriginAnglePhi / 180 * 3.1415926;
+    float TransToOriginAngleThetaRad = TransToOriginAngleTheta / 180 * 3.1415926;
+    float TransToOriginAngleGammaRad = TransToOriginAngleGamma / 180 * 3.1415926;
 
     float CosPhi = cos(TransToOriginAnglePhiRad);
     float SinPhi = sin(TransToOriginAnglePhiRad);
@@ -76,7 +76,7 @@ void CoordinateCalculateTransToOrigin(float TransToOriginAngleGamma, float Trans
 
 /* 计算线偏差和角偏差 */
 void LineDeviationCal(
-				int		ScatteringPointNum,
+				ScatteringPoint		*ScatteringPointPtr,
 				Point	*PointSight,	//视线坐标系下散射点坐标
 				Point	*PointGround,	//地理坐标系下散射点坐标
 				float   RadarTranX,
@@ -96,6 +96,7 @@ void LineDeviationCal(
 
 	//计算相对幅度，为RCS取根号
 	float	*RelativeAmp;	//相对幅度
+	int		ScatteringPointNum = ScatteringPointPtr->PointNum;
 	RelativeAmp = (float*)malloc(sizeof(float) * ScatteringPointNum);
 	for(i = 0 ; i < ScatteringPointNum ; ++i)
 	{
@@ -146,7 +147,11 @@ void LineDeviationCal(
 	float	LineDeviationDenominator;
 	for(i = 0 ; i < ScatteringPointNum ; ++i)
 	{
-		LineDeviationDenominator = RelativeAmp[i] * RelativeAmp[j] * cos(Phase[i] - Phase[j]);
+		for(j = 0 ; j < ScatteringPointNum ; ++j)
+		{
+			double	temp = cos(Phase[i] - Phase[j]);
+			LineDeviationDenominator += RelativeAmp[i] * RelativeAmp[j] * cos(Phase[i] - Phase[j]);
+		}
 	}
 	*LineDeviationY = LineDeviationMemberSightY / LineDeviationDenominator;
 	*LineDeviationZ = LineDeviationMemberSightZ / LineDeviationDenominator;
@@ -230,10 +235,6 @@ void RangeSpreadTargetParam0Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 		temp -= R1;	//一维距离像，原点为目标所在位置
 		int		PositionTemp;
 		PositionTemp = temp / (LIGHT_SPEED/FPGA_CLK_FRE/2);
-//		if(PointSight[i].X > 0)
-//			PositionTemp = temp / (LIGHT_SPEED/FPGA_CLK_FRE/2);
-//		else
-//			PositionTemp = - temp / (LIGHT_SPEED/FPGA_CLK_FRE/2);
 		PositionTemp += RANGE_PROFILE_NUM/2;	//使RANGE_PROFILE_NUM/2为0位置
 		RangeProfileTemp[PositionTemp] += ScatteringPointPtr->PointData[i].RCS;
 	}
@@ -246,8 +247,8 @@ void RangeSpreadTargetParam0Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 						(double)Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetPt +
 						(double)Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetAe +
 						(double)10 * log10(RangeProfileTemp[i]) -
-						10 * log10(4 * PI * (double)R1 * R1) -
-						10 * log10(4 * PI * (double)R2 * R2);
+						(double)10 * log10(4 * PI * (double)R1 * R1) -
+						(double)10 * log10(4 * PI * (double)R2 * R2);
 		Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam0SetBackFrame.RangeProfile[i] = Power;	//回传数据
 		Msg2To1Ptr->RangeProfile[i] =
 				sqrt(pow(10,((Power - SIG_POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
@@ -378,7 +379,7 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 	float	AngleDeviationTheta;
 	float	AngleDeviationPhi;
 	LineDeviationCal(
-					ScatteringPointPtr->PointNum,
+					ScatteringPointPtr,
 					PointSight,		//视线坐标系下散射点坐标
 					PointGround,	//地理坐标系下散射点坐标
 					GroundCoordRadarTranX,
@@ -393,8 +394,8 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 					&LineDeviationY,
 					&LineDeviationZ
 	);
-	AngleDeviationTheta = LineDeviationY / RecvR;
-	AngleDeviationPhi = LineDeviationZ / RecvR;
+	AngleDeviationTheta = atan(LineDeviationY / RecvR) / PI * 180;
+	AngleDeviationPhi = atan(LineDeviationZ / RecvR) / PI * 180;
 
 
 	/* 角度赋值  */
@@ -403,9 +404,10 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 
 
 	/* 得出一维距离像 */
+	float	RangeProfileTemp[RANGE_PROFILE_NUM];
 	for(i = 0 ; i < RANGE_PROFILE_NUM ; i++)
 	{
-		Msg2To1Ptr->RangeProfile[i] = 0;
+		RangeProfileTemp[i] = 0;
 	}
 	for(i = 0 ; i < ScatteringPointPtr->PointNum ; ++i)
 	{
@@ -415,7 +417,7 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 		float	RecvRangeTemp = sqrt(	pow(GroundCoordTargetX + PointGround[i].X - GroundCoordRadarRecvX, 2) +
 										pow(GroundCoordTargetY + PointGround[i].Y - GroundCoordRadarRecvY, 2) +
 										pow(GroundCoordTargetZ + PointGround[i].Z - GroundCoordRadarRecvZ, 2));
-		Msg2To1Ptr->RangeProfile[(int)((TranRangeTemp + RecvRangeTemp - TranR - RecvR) / (LIGHT_SPEED/FPGA_CLK_FRE/2) + RANGE_PROFILE_NUM/2)]
+		RangeProfileTemp[(int)((TranRangeTemp + RecvRangeTemp - TranR - RecvR) / (LIGHT_SPEED/FPGA_CLK_FRE/2) + RANGE_PROFILE_NUM/2)]
 		                         	 += ScatteringPointPtr->PointData[i].RCS;
 	}
 	//用功率计算幅度
@@ -424,9 +426,10 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 		double Power = 	(double)Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.TargetG +
 						(double)Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.TargetPt +
 						(double)Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.TargetAe +
-						(double)Msg2To1Ptr->RangeProfile[i] -
-							10 * log10(4 * PI * (double)RecvR * RecvR) /
-							10 * log10(4 * PI * (double)TranR * TranR);
+						(double)10 * log10(RangeProfileTemp[i]) -
+						(double)10 * log10(4 * PI * (double)TranR * TranR) -
+						(double)10 * log10(4 * PI * (double)RecvR * RecvR);
+		Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame.RangeProfile[i] = Power;	//回传数据
 		Msg2To1Ptr->RangeProfile[i] =
 				sqrt(pow(10,((Power - SIG_POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
 	}
@@ -441,9 +444,6 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 	Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame.LineDeviationTheta = LineDeviationY;
 	Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame.TargetDistanceRecv = RecvR;
 	Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame.TargetDistanceTran = TranR;
-	memcpy(	Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame.RangeProfile,
-			Msg2To1Ptr->RangeProfile,
-			sizeof(Msg2To1Ptr->RangeProfile));
 
 	free(PointSight);
 	free(PointGround);
