@@ -151,7 +151,7 @@ int UdpFunc( SOCKET s, UINT32 unused )
 				sizeof(ScatteringPointUdpFramePtr->ScatteringPointData.PointNum) +
 								sizeof(Point) * (ScatteringPointUdpFramePtr->ScatteringPointData.PointNum));
 
-		status = Notify_sendEvent(PROC_ID_CORE1, LINE_ID_CORE0_CORE1, EVENT_ID_CORE0_CORE1, QMSS_RDY_NOTIFY, TRUE);
+//		status = Notify_sendEvent(PROC_ID_CORE1, LINE_ID_CORE0_CORE1, EVENT_ID_CORE0_CORE1, QMSS_RDY_NOTIFY, TRUE);
 
 		//回传数据
 		char success = 0x01;

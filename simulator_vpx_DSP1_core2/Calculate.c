@@ -216,9 +216,10 @@ void RangeSpreadTargetParam0Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 	}
 
 	//得出一维距离像
+	float	RangeProfileTemp[RANGE_PROFILE_NUM];
 	for(i = 0 ; i < RANGE_PROFILE_NUM ; i++)
 	{
-		Msg2To1Ptr->RangeProfile[i] = 0;
+		RangeProfileTemp[i] = 0;
 	}
 	for(i = 0 ; i < ScatteringPointPtr->PointNum ; ++i)
 	{
@@ -234,7 +235,7 @@ void RangeSpreadTargetParam0Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 //		else
 //			PositionTemp = - temp / (LIGHT_SPEED/FPGA_CLK_FRE/2);
 		PositionTemp += RANGE_PROFILE_NUM/2;	//使RANGE_PROFILE_NUM/2为0位置
-		Msg2To1Ptr->RangeProfile[PositionTemp] += ScatteringPointPtr->PointData[i].RCS;
+		RangeProfileTemp[PositionTemp] += ScatteringPointPtr->PointData[i].RCS;
 	}
 
 
@@ -244,9 +245,10 @@ void RangeSpreadTargetParam0Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 		double Power = 	(double)Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetG +
 						(double)Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetPt +
 						(double)Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetAe +
-						(double)Msg2To1Ptr->RangeProfile[i] -
-						10 * log10(4 * PI * (double)R1 * R1) /
+						(double)10 * log10(RangeProfileTemp[i]) -
+						10 * log10(4 * PI * (double)R1 * R1) -
 						10 * log10(4 * PI * (double)R2 * R2);
+		Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam0SetBackFrame.RangeProfile[i] = Power;	//回传数据
 		Msg2To1Ptr->RangeProfile[i] =
 				sqrt(pow(10,((Power - SIG_POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
 	}
@@ -265,11 +267,6 @@ void RangeSpreadTargetParam0Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 	//角度赋值
 	Msg2To34567Ptr->TargetAngleTheta = Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetTheta;
 	Msg2To34567Ptr->TargetAnglePhi = Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetPhi;
-
-	//回传数据
-	memcpy(	Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam0SetBackFrame.RangeProfile,
-			Msg2To1Ptr->RangeProfile,
-			sizeof(Msg2To1Ptr->RangeProfile));
 }
 
 /* 扩展目标模型，参数1计算 */

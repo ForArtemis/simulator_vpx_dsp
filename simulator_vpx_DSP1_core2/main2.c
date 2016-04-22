@@ -314,6 +314,7 @@ void MainThread()
 		MessageQ_setMsgId(&(Msg2To6Ptr->header), ManualMsgID);
 		MessageQ_setMsgId(&(Msg2To7Ptr->header), ManualMsgID);
 
+
 		//µãÄ¿±ê
 		if(((Msg0To2Ptr->TargetFrameId) & 0x0000ffff) == POINT_TARGET)
 		{
