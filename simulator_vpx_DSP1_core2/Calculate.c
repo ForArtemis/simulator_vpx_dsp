@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "../CustomHeader.h"
+#include "../CustomHeaderDsp1.h"
 
 //---------------散射点信息存储位置--------------------------
 extern ScatteringPoint		*ScatteringPointPtr;

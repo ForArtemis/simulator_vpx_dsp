@@ -52,3 +52,8 @@ Debug/
 dvt/
 
 
+*.pdom
+*.pdom
+*.index
+*.snap
+*.xml

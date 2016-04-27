@@ -96,7 +96,7 @@
 #include <ti/ipc/HeapBufMP.h>
 #include <ti/ipc/MultiProc.h>
 /* Custom header */
-#include "../CustomHeader.h"
+#include "../CustomHeaderDsp1.h"
 /* IPC register control */
 #include<ti/csl/csl_ipcAux.h>
 #include <ti/ipc/Notify.h>
@@ -705,7 +705,6 @@ Void MainThread(void)
 	Srio_SockAddrInfo       *SrioSockInfo;
 	SrioFrame0 				*SrioFrame0SendPtr;
 	SrioFrame1				*SrioFrame1SendPtr;
-	SrioFrame2				*SrioFrame2SendPtr;
 
 	SrioSockInfo = (Srio_SockAddrInfo*)malloc(sizeof(Srio_SockAddrInfo));
 	System_printf("SrioSockInfo malloc size is %d.\n", sizeof(Srio_SockAddrInfo));
@@ -725,12 +724,7 @@ Void MainThread(void)
 	{
 		System_printf("SrioFrame1 malloc failed./n");
 	}
-	SrioFrame2SendPtr = (SrioFrame2*)malloc(sizeof(SrioFrame2));
-	System_printf("SrioFrame2 malloc size is %d.\n", sizeof(SrioFrame2));
-	if(!SrioFrame2SendPtr)//如果malloc失败
-	{
-		System_printf("SrioFrame2 malloc failed./n");
-	}
+
 	Msg2To1Ptr = (MsgCore2ToCore1*)malloc(sizeof(MsgCore2ToCore1));
 	System_printf("MsgCore2ToCore1 malloc size is %d.\n", sizeof(MsgCore2ToCore1));
 	if(!Msg2To1Ptr)//如果malloc失败
@@ -907,17 +901,17 @@ Void MainThread(void)
     	//接收到休眠帧
     	else if(NotifyCore0Payload == SLEEP_ENABLE_NOTIFY)
     	{
-    		for(i = 0 ; i < RANGE_PROFILE_NUM ; i++)
-    		{
-    			SrioFrame0SendPtr->RangeProfile[i] = 0;
-    		}
-    		SrioFrame0SendPtr->DistanceDelay = 0;
-    		SrioFrame0SendPtr->DopplerFrePinc = 0;
-    		for(i = 0 ; i < ARRAY_NUM ; i++)
-			{
-    			SrioFrame1SendPtr->OrientationVectorReal[i] = 0;
-    			SrioFrame2SendPtr->OrientationVectorImag[i] = 0;
-			}
+//    		for(i = 0 ; i < RANGE_PROFILE_NUM ; i++)
+//    		{
+//    			SrioFrame0SendPtr->RangeProfile[i] = 0;
+//    		}
+//    		SrioFrame0SendPtr->DistanceDelay = 0;
+//    		SrioFrame0SendPtr->DopplerFrePinc = 0;
+//    		for(i = 0 ; i < ARRAY_NUM ; i++)
+//			{
+//    			SrioFrame1SendPtr->OrientationVectorReal[i] = 0;
+//    			SrioFrame2SendPtr->OrientationVectorImag[i] = 0;
+//			}
     	}
     	//接收到工作参数帧
     	else if(NotifyCore0Payload == WORK_PARAM_SET_NOTIFY)
@@ -969,31 +963,31 @@ Void MainThread(void)
 			{
 				SrioFrame0SendPtr->RangeProfile[i] = Msg2To1Ptr->RangeProfile[i];
 			}
-			for(i = 0 ; i < 20 ; i++)
-			{
-				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg3To1Ptr->OrientationVectorImag[i];
-				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg3To1Ptr->OrientationVectorReal[i];
-			}
-			for(i = 20 ; i < 40 ; i++)
-			{
-				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg4To1Ptr->OrientationVectorImag[i];
-				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg4To1Ptr->OrientationVectorReal[i];
-			}
-			for(i = 40 ; i < 60 ; i++)
-			{
-				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg5To1Ptr->OrientationVectorImag[i];
-				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg5To1Ptr->OrientationVectorReal[i];
-			}
-			for(i = 60 ; i <80 ; i++)
-			{
-				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg6To1Ptr->OrientationVectorImag[i];
-				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg6To1Ptr->OrientationVectorReal[i];
-			}
-			for(i = 80 ; i < 96 ; i++)
-			{
-				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg7To1Ptr->OrientationVectorImag[i];
-				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg7To1Ptr->OrientationVectorReal[i];
-			}
+//			for(i = 0 ; i < 20 ; i++)
+//			{
+//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg3To1Ptr->OrientationVectorImag[i];
+//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg3To1Ptr->OrientationVectorReal[i];
+//			}
+//			for(i = 20 ; i < 40 ; i++)
+//			{
+//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg4To1Ptr->OrientationVectorImag[i];
+//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg4To1Ptr->OrientationVectorReal[i];
+//			}
+//			for(i = 40 ; i < 60 ; i++)
+//			{
+//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg5To1Ptr->OrientationVectorImag[i];
+//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg5To1Ptr->OrientationVectorReal[i];
+//			}
+//			for(i = 60 ; i <80 ; i++)
+//			{
+//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg6To1Ptr->OrientationVectorImag[i];
+//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg6To1Ptr->OrientationVectorReal[i];
+//			}
+//			for(i = 80 ; i < 96 ; i++)
+//			{
+//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg7To1Ptr->OrientationVectorImag[i];
+//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg7To1Ptr->OrientationVectorReal[i];
+//			}
     	}
 
 		/* Populate the DIO Address Information where the data is to be sent. */
@@ -1001,15 +995,20 @@ Void MainThread(void)
 		SrioSockInfo->dio.rapidIOLSB    = 0x00000000;
 		SrioSockInfo->dio.dstID         = DEVICE_ID2_16BIT;
 		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
+//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
 		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
 
 		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
-		memcpy(SrioMemoryPtr, &(SrioFrame0SendPtr->DopplerFrePinc), sizeof(SrioFrame0));
+		memcpy(SrioMemoryPtr, SrioFrame0SendPtr->RangeProfile, sizeof(SrioFrame0));
 		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 128, SrioSockInfo);
-		memcpy(SrioMemoryPtr, (SrioFrame1SendPtr->OrientationVectorReal), sizeof(SrioFrame1));
-		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
-		memcpy(SrioMemoryPtr, (SrioFrame2SendPtr->OrientationVectorImag), sizeof(SrioFrame2));
-		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
+
+//		SrioSockInfo->dio.rapidIOLSB    = 0x00000080 >> 3; 	//FPGA中RAN为64位
+//		memcpy(SrioMemoryPtr, (SrioFrame1SendPtr->OrientationVectorReal), sizeof(SrioFrame1));
+//		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
+//
+//		SrioSockInfo->dio.rapidIOLSB    = 0x00000180 >> 3;	//FPGA中RAN为64位
+//		memcpy(SrioMemoryPtr, (SrioFrame2SendPtr->OrientationVectorImag), sizeof(SrioFrame2));
+//		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
 
 //		while((status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, (sizeof(Uint32) + sizeof(Uint16) + sizeof(Uint16) + sizeof(Uint16)*10), SrioSockInfo)) != 0) ;
 //		if(status != 0)

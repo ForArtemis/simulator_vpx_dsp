@@ -68,7 +68,7 @@
 /* IPC register control */
 #include<ti/csl/csl_ipcAux.h>
 /* Custom header */
-#include "../CustomHeader.h"
+#include "../CustomHeaderDsp1.h"
 
 #include <ti/ndk/inc/os/osif.h>
 
@@ -76,6 +76,15 @@
 #include <ti/ipc/SharedRegion.h>
 
 #include <xdc/runtime/Memory.h>
+
+#include <ti/sysbios/family/c66/tci66xx/CpIntc.h>
+#include <ti/sysbios/hal/Hwi.h>
+#include <xdc/runtime/Error.h>
+
+#include "hyplnkLLDIFace.h"
+#include "hyplnkLLDCfg.h"
+#include "hyplnkIsr.h"
+#include "hyplnkPlatCfg.h"
 
 
 //-------------------------------------------------------------------------
@@ -130,6 +139,32 @@ char *DNSServer   = "0.0.0.0";          // Used when set to anything but zero
 // MAC address of the PC where you want to launch the webpages and initiate PING to NDK */
 
 Uint8 clientMACAddress [6] = {0x5C, 0x26, 0x0A, 0x69, 0x44, 0x0B}; /* MAC address for my PC */
+
+
+/*****************************************************************************
+ * Cache line size (128 works on any location)
+ *****************************************************************************/
+#define hyplnk_EXAMPLE_LINE_SIZE      128
+/* This is the actual data buffer that will be accessed.
+ *
+ * When accessing this location directly, the program is playing
+ * the role of the remote device (remember we are in loopback).
+ *
+ * If this is placed in an L2 RAM there are no other dependancies.
+ *
+ * If this is placed in MSMC or DDR RAM, then the SMS
+ * or SES MPAX must be configured to allow the access.
+ */
+#pragma DATA_SECTION (HyplinkDataDsp1ToDsp2Ptr, ".bss:remoteable");
+#pragma DATA_ALIGN (HyplinkDataDsp1ToDsp2Ptr, hyplnk_EXAMPLE_LINE_SIZE);
+HyplinkDataDsp1ToDsp2 HyplinkDataDsp1ToDsp2ToSend;
+/*
+ * This pointer is the local address within the Hyperlink's address
+ * space which will access dataBuffer via HyperLink.
+ *
+ */
+HyplinkDataDsp1ToDsp2 *bufferThroughHypLnk;
+
 
 /*************************************************************************
  *  @b EVM_init()
@@ -300,6 +335,12 @@ void IPC_init()
 /* Timer ISR */
 extern void ManualModeTimerIsr();
 
+/* Hyperlink ISR */
+void HyperlinkIsr()
+{
+
+}
+
 //---------------------------------------------------------------------
 // Main Entry Point
 //---------------------------------------------------------------------
@@ -317,13 +358,80 @@ int main()
 int MainThread()
 {
 	int status;
+	int retVal;
 	int             rc;
 	HANDLE          hCfg;
 	QMSS_CFG_T      qmss_cfg_ndk;
 	QMSS_CFG_T      qmss_cfg_srio;
 	CPPI_CFG_T      cppi_cfg;
 
+	/* 核间通信初始化 */
 	IPC_init();
+
+	/* Hyperlink interrupt init */
+	Int eventId;
+	Hwi_Params params;
+	Error_Block eb;
+
+	// Initialize the error block
+	Error_init(&eb);
+
+	// Map system interrupt 111 to host interrupt 10 on Intc 0
+	CpIntc_mapSysIntToHostInt(0, CSL_INTC0_VUSR_INT_O, 10);
+
+	// Plug the function and argument for System interrupt 15 then enable it
+	CpIntc_dispatchPlug(CSL_INTC0_VUSR_INT_O, &HyperlinkIsr, 0, TRUE);
+
+	// Enable Host interrupt 10 on Intc 0
+	CpIntc_enableHostInt(0, 10);
+
+	// Get the eventId associated with Host interrupt 10
+	eventId = CpIntc_getEventId(10);
+
+	// Initialize the Hwi parameters
+	Hwi_Params_init(&params);
+
+	// Set the eventId associated with the Host Interrupt
+	params.eventId = eventId;
+
+	// The arg must be set to the Host interrupt
+	params.arg = 10;
+
+	// Enable the interrupt vector
+	params.enableInt = TRUE;
+
+	// Create the Hwi on interrupt 5 then specify 'CpIntc_dispatch'
+	// as the function.
+	Hwi_create(6, &CpIntc_dispatch, &params, &eb);
+
+	/* Hyperlink 初始化 */
+	/* Hyperlink is not up yet, so we don't have to worry about concurrence */
+	memset (&HyplinkDataDsp1ToDsp2ToSend, 0, sizeof(HyplinkDataDsp1ToDsp2ToSend));
+
+//	/* Set up the system PLL, PSC, and DDR as required for this HW */
+//	System_printf ("About to do Hyperlink system setup (PLL, PSC, and DDR)\n");
+//	if ((retVal = hyplnkExampleSysSetup()) != hyplnk_RET_OK) {
+//		System_printf ("Hyperlink system setup failed (%d)\n", (int)retVal);
+//		exit(1);
+//	}
+//	System_printf ("Hyperlink system setup worked\n");
+//
+//
+//	/* Enable the peripheral */
+//	System_printf ("About to set up HyperLink Peripheral\n");
+//	if ((retVal = hyplnkExamplePeriphSetup()) != hyplnk_RET_OK) {
+//		System_printf ("HyperLink system setup failed (%d)\n", (int)retVal);
+//		exit(1);
+//	}
+//	System_printf ("HyperLink Peripheral setup worked\n");
+//
+//	/* Set up address mapsrc */
+//	if ((retVal = hyplnkExampleAddrMap (&HyplinkDataDsp1ToDsp2ToSend, (void **)&bufferThroughHypLnk)) != hyplnk_RET_OK) {
+//		System_printf ("Address map setup failed (%d)\n", (int)retVal);
+//		exit(1);
+//	}
+
+
 
 //	//为发送给DSP2的数据帧分配空间
 //	HyplinkDataDsp1ToDsp2* HyplinkDataDsp1ToDsp2Ptr = (HyplinkDataDsp1ToDsp2*)malloc(sizeof(HyplinkDataDsp1ToDsp2));

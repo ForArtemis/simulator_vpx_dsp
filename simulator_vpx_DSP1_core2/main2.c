@@ -26,7 +26,7 @@
 
 #include <string.h>
 
-#include "../CustomHeader.h"
+#include "../CustomHeaderDsp1.h"
 #include "Calculate.h"
 
 #include <stdlib.h>
@@ -309,6 +309,8 @@ void MainThread()
 
 		CACHE_invL1d(Msg0To2Ptr, sizeof(MsgCore0ToCore2), CACHE_WAIT);	//从cache中invalid
 		CACHE_invL1d(ScatteringPointPtr, sizeof(ScatteringPoint), CACHE_WAIT);	//从cache中invalid
+		CACHE_invL1d(ScatteringPointPtr, sizeof(ScatteringPointPtr->PointNum), CACHE_WAIT);	//从cache中invalid
+		CACHE_invL1d(ScatteringPointPtr->PointData, ScatteringPointPtr->PointNum * sizeof(Point), CACHE_WAIT);	//从cache中invalid
 
 		ManualMsgID = Msg0To2Ptr->header.msgId;
 

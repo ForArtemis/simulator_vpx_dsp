@@ -151,19 +151,16 @@
 /* SRIO 数据帧 */
 typedef struct
 {
+	unsigned short 	RangeProfile[RANGE_PROFILE_NUM];
 	unsigned int	DopplerFrePinc;
 	unsigned short  DistanceDelay;
-	unsigned short  NoisePower;
-	unsigned short 	RangeProfile[RANGE_PROFILE_NUM];
-}SrioFrame0;
+//	unsigned short  NoisePower;
+}SrioFrame0;	//除导向性矢量外的参数
 typedef struct
 {
-	unsigned short  OrientationVectorReal[ARRAY_NUM];
-}SrioFrame1;
-typedef struct
-{
-	unsigned short  OrientationVectorImag[ARRAY_NUM];
-}SrioFrame2;
+	unsigned short  OrientationVectorReal[ARRAY_NUM/3];
+	unsigned short  OrientationVectorImag[ARRAY_NUM/3];
+}SrioFrame1;	//导向性矢量参数，包含32个导向性矢量，因为一块DA产生板可以产生32个通道的回波
 
 /* 目标参数  */
 //点目标
@@ -434,8 +431,6 @@ typedef struct
 	int				FrameId;
 	ScatteringPoint	ScatteringPointData;
 }ScatteringPointUdpFrame;
-
-
 
 
 

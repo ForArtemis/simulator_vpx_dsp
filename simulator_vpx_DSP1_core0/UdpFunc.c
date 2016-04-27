@@ -45,7 +45,7 @@
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/hal/Timer.h>
-#include "../CustomHeader.h"
+#include "../CustomHeaderDsp1.h"
 
 #include <time.h>
 #include <math.h>
@@ -81,7 +81,7 @@ extern ScatteringPoint		*ScatteringPointPtr;
 
 
 //send to DSP2
-extern HyplinkDataDsp1ToDsp2	HyplinkDataDsp1ToDsp2Ptr;
+extern HyplinkDataDsp1ToDsp2	HyplinkDataDsp1ToDsp2ToSend;
 
 int			TimerCnt = 0;
 int         ManualMsgID = 0;
@@ -168,7 +168,11 @@ int UdpFunc( SOCKET s, UINT32 unused )
 	{
 		WorkParamUdpFrame* WorkParamUdpFramePtr = (WorkParamUdpFrame*)malloc(sizeof(WorkParamUdpFrame));
 		memcpy(WorkParamUdpFramePtr, pBuf, sizeof(WorkParamUdpFrame));	//不这样操作会在读取时出问题，可能是因为cache
+		memcpy(	&HyplinkDataDsp1ToDsp2ToSend,
+				&(WorkParamUdpFramePtr->JammingFrameId),
+				sizeof(HyplinkDataDsp1ToDsp2ToSend));
 		MessageQ_setMsgId(&(Msg0To2Ptr->header), MsgID++);
+
 
 		/* 提取目标参数 */
 		//点目标
