@@ -40,14 +40,15 @@
 #include <ti/csl/cslr_device.h>
 #include <ti/csl/csl_cpIntcAux.h>
 #include <ti/drv/hyplnk/hyplnk.h>
-#include <csl_intc.h>
-#include <csl_intcAux.h>
+#include <ti/csl/src/intc/csl_intc.h>
+#include <ti/csl/src/intc/csl_intcAux.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "hyplnkIsr.h"
 #include "hyplnkPlatCfg.h"
 #include <c6x.h>
+#include <xdc/runtime/System.h>
 
 
 CSL_IntcEventHandlerRecord  hyplnkExampleEvtHdlrRecord[2];
@@ -78,65 +79,66 @@ void hyplnkExampleCheckOneStat (hyplnkLocation_e  location,
  ****************************************************************************/
 void hyplnkExampleIsr (void *eventId)
 {
-  hyplnkRegisters_t       regs;
-  hyplnkIntStatusClrReg_t intStatusClr;
-  hyplnkIntPendSetReg_t   intPendSet;
-  Hyplnk_Handle           handle = NULL;
-  uint32_t                remainingInterrupts;
-  CSL_CPINTC_Handle       cpintcHnd;
-
-  cpintcHnd = CSL_CPINTC_open (0);
-  if (! cpintcHnd) {
-    hyplnkExampleFatal(0);
-  }
-
-  memset (&regs, 0, sizeof(regs));
-  regs.intStatusClr = &intStatusClr;
-
-  if (Hyplnk_open(0, &handle) != hyplnk_RET_OK) {
-    hyplnkExampleFatal(1);
-  }
-
-  /* Figure out which interrupt it is */
-  if (Hyplnk_readRegs (handle, hyplnk_LOCATION_LOCAL, &regs) != hyplnk_RET_OK) {
-    hyplnkExampleFatal(2);
-  }
-
-  /* Process the fatal error interrupt */
-  remainingInterrupts = intStatusClr.intClr;
-  if (remainingInterrupts & (1 << hyplnk_EXAMPLE_ISRNUM_FATAL)) {
-    remainingInterrupts &= ~(1 << hyplnk_EXAMPLE_ISRNUM_FATAL);
-    printf ("Fatal error detected\n");
-    hyplnkExampleCheckOneStat (hyplnk_LOCATION_LOCAL, "fatal isr", 1);
-    hyplnkExampleFatal(3);
-  }
-
-  /* Placeholder to process other interrupts that happened at the same time */
-  if (remainingInterrupts) {
-    printf ("Unknown interrupts: 0x%08x\n", remainingInterrupts);
-  }
-
-  /* Clear the interrupt */
-  if (Hyplnk_writeRegs (handle, hyplnk_LOCATION_LOCAL, &regs) != hyplnk_RET_OK) {
-    hyplnkExampleFatal(4);
-  }
-
-  /* Acknowledge CorePac interrupt */
-  CSL_intcHwControl(hyplnkExampleIntcHnd, CSL_INTC_CMD_EVTCLEAR, NULL);
-  /* Acknowledge cp intc interrupt */
-  CSL_CPINTC_clearSysInterrupt (cpintcHnd, CSL_INTC0_VUSR_INT_O);
-
-  /* Retrigger any remaining interrupts */
-  intPendSet.intSet = 0;
-  regs.intStatusClr = NULL;
-  regs.intPendSet   = &intPendSet;
-  if (Hyplnk_writeRegs (handle, hyplnk_LOCATION_LOCAL, &regs) != hyplnk_RET_OK) {
-    hyplnkExampleFatal(4);
-  }
-
-  if (Hyplnk_close (&handle) != hyplnk_RET_OK) {
-    hyplnkExampleFatal(5);
-  }
+	System_printf("Hyperlink interrupt.\n");
+//  hyplnkRegisters_t       regs;
+//  hyplnkIntStatusClrReg_t intStatusClr;
+//  hyplnkIntPendSetReg_t   intPendSet;
+//  Hyplnk_Handle           handle = NULL;
+//  uint32_t                remainingInterrupts;
+//  CSL_CPINTC_Handle       cpintcHnd;
+//
+//  cpintcHnd = CSL_CPINTC_open (0);
+//  if (! cpintcHnd) {
+//    hyplnkExampleFatal(0);
+//  }
+//
+//  memset (&regs, 0, sizeof(regs));
+//  regs.intStatusClr = &intStatusClr;
+//
+//  if (Hyplnk_open(0, &handle) != hyplnk_RET_OK) {
+//    hyplnkExampleFatal(1);
+//  }
+//
+//  /* Figure out which interrupt it is */
+//  if (Hyplnk_readRegs (handle, hyplnk_LOCATION_LOCAL, &regs) != hyplnk_RET_OK) {
+//    hyplnkExampleFatal(2);
+//  }
+//
+//  /* Process the fatal error interrupt */
+//  remainingInterrupts = intStatusClr.intClr;
+//  if (remainingInterrupts & (1 << hyplnk_EXAMPLE_ISRNUM_FATAL)) {
+//    remainingInterrupts &= ~(1 << hyplnk_EXAMPLE_ISRNUM_FATAL);
+//    printf ("Fatal error detected\n");
+//    hyplnkExampleCheckOneStat (hyplnk_LOCATION_LOCAL, "fatal isr", 1);
+//    hyplnkExampleFatal(3);
+//  }
+//
+//  /* Placeholder to process other interrupts that happened at the same time */
+//  if (remainingInterrupts) {
+//    printf ("Unknown interrupts: 0x%08x\n", remainingInterrupts);
+//  }
+//
+//  /* Clear the interrupt */
+//  if (Hyplnk_writeRegs (handle, hyplnk_LOCATION_LOCAL, &regs) != hyplnk_RET_OK) {
+//    hyplnkExampleFatal(4);
+//  }
+//
+//  /* Acknowledge CorePac interrupt */
+//  CSL_intcHwControl(hyplnkExampleIntcHnd, CSL_INTC_CMD_EVTCLEAR, NULL);
+//  /* Acknowledge cp intc interrupt */
+//  CSL_CPINTC_clearSysInterrupt (cpintcHnd, CSL_INTC0_VUSR_INT_O);
+//
+//  /* Retrigger any remaining interrupts */
+//  intPendSet.intSet = 0;
+//  regs.intStatusClr = NULL;
+//  regs.intPendSet   = &intPendSet;
+//  if (Hyplnk_writeRegs (handle, hyplnk_LOCATION_LOCAL, &regs) != hyplnk_RET_OK) {
+//    hyplnkExampleFatal(4);
+//  }
+//
+//  if (Hyplnk_close (&handle) != hyplnk_RET_OK) {
+//    hyplnkExampleFatal(5);
+//  }
 
 }
 
@@ -155,11 +157,11 @@ static int hyplnkExampleInitCoreIntc (void)
     return -1;
 
   /* Enable NMIs */
-  if (CSL_intcGlobalNmiEnable () != CSL_SOK) 
+  if (CSL_intcGlobalNmiEnable () != CSL_SOK)
     return -1;
- 
+
   /* Enable global interrupts */
-  if (CSL_intcGlobalEnable (&state) != CSL_SOK) 
+  if (CSL_intcGlobalEnable (&state) != CSL_SOK)
     return -1;
 
   /* INTC has been initialized successfully. */

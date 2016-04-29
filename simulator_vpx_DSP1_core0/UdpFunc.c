@@ -81,7 +81,8 @@ extern ScatteringPoint		*ScatteringPointPtr;
 
 
 //send to DSP2
-extern HyplinkDataDsp1ToDsp2	HyplinkDataDsp1ToDsp2ToSend;
+extern 	HyplinkDataDsp1Dsp2	HyplinkDataDsp1Dsp2Buffer;
+extern	HyplinkDataDsp1Dsp2 *bufferThroughHypLnk;
 
 int			TimerCnt = 0;
 int         ManualMsgID = 0;
@@ -168,9 +169,12 @@ int UdpFunc( SOCKET s, UINT32 unused )
 	{
 		WorkParamUdpFrame* WorkParamUdpFramePtr = (WorkParamUdpFrame*)malloc(sizeof(WorkParamUdpFrame));
 		memcpy(WorkParamUdpFramePtr, pBuf, sizeof(WorkParamUdpFrame));	//不这样操作会在读取时出问题，可能是因为cache
-		memcpy(	&HyplinkDataDsp1ToDsp2ToSend,
+//		memcpy(	&HyplinkDataDsp1Dsp2Buffer,
+//				&(WorkParamUdpFramePtr->JammingFrameId),
+//				sizeof(HyplinkDataDsp1Dsp2Buffer) - sizeof(HyplinkDataDsp1Dsp2Buffer.JammingParamDsp2ToDsp1));
+		memcpy(	bufferThroughHypLnk,
 				&(WorkParamUdpFramePtr->JammingFrameId),
-				sizeof(HyplinkDataDsp1ToDsp2ToSend));
+				sizeof(HyplinkDataDsp1Dsp2) - sizeof(bufferThroughHypLnk->JammingParamDsp2ToDsp1));
 		MessageQ_setMsgId(&(Msg0To2Ptr->header), MsgID++);
 
 

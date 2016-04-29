@@ -769,7 +769,9 @@ Void MainThread(void)
 	IPC_init();
 
 	/* Wait core 0 signal of QMSS and CPPI configure finish */
+	System_printf("Semaphore_pend\n");
 	Semaphore_pend(QmssRdySemHandle, BIOS_WAIT_FOREVER);
+	System_printf("Semaphore_pend finished\n");
 
 	/* Start the QMSS. */
 	if (Qmss_start() != QMSS_SOK)

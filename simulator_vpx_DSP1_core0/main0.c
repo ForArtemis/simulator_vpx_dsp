@@ -155,15 +155,16 @@ Uint8 clientMACAddress [6] = {0x5C, 0x26, 0x0A, 0x69, 0x44, 0x0B}; /* MAC addres
  * If this is placed in MSMC or DDR RAM, then the SMS
  * or SES MPAX must be configured to allow the access.
  */
-#pragma DATA_SECTION (HyplinkDataDsp1ToDsp2Ptr, ".bss:remoteable");
-#pragma DATA_ALIGN (HyplinkDataDsp1ToDsp2Ptr, hyplnk_EXAMPLE_LINE_SIZE);
-HyplinkDataDsp1ToDsp2 HyplinkDataDsp1ToDsp2ToSend;
+//#pragma DATA_SECTION (HyplinkDataDsp1Dsp2Buffer, ".bss:remoteable");
+#pragma DATA_SECTION (HyplinkDataDsp1Dsp2Buffer, "hyperlink");
+#pragma DATA_ALIGN (HyplinkDataDsp1Dsp2Buffer, hyplnk_EXAMPLE_LINE_SIZE);
+HyplinkDataDsp1Dsp2 HyplinkDataDsp1Dsp2Buffer;
 /*
  * This pointer is the local address within the Hyperlink's address
  * space which will access dataBuffer via HyperLink.
  *
  */
-HyplinkDataDsp1ToDsp2 *bufferThroughHypLnk;
+HyplinkDataDsp1Dsp2 *bufferThroughHypLnk;
 
 
 /*************************************************************************
@@ -223,6 +224,12 @@ void EVM_init()
  }
 }
 
+
+/* Hyperlink ISR */
+void HyperlinkIsr()
+{
+	System_printf("HyperlinkIsr()\n");
+}
 
 /* Initialize IPC and messageQ */
 void IPC_init()
@@ -332,46 +339,29 @@ void IPC_init()
 	System_printf("Debug(Core 0): IPC_init() finished. \n");
 }
 
-/* Timer ISR */
-extern void ManualModeTimerIsr();
 
-/* Hyperlink ISR */
-void HyperlinkIsr()
+void HyperlinkInit()
 {
-
-}
-
-//---------------------------------------------------------------------
-// Main Entry Point
-//---------------------------------------------------------------------
-int main()
-{
-	EVM_init();
-
-	/* Start the BIOS 6 Scheduler */
-	BIOS_start ();
-}
-
-//
-// Main Thread
-//
-int MainThread()
-{
-	int status;
-	int retVal;
-	int             rc;
-	HANDLE          hCfg;
-	QMSS_CFG_T      qmss_cfg_ndk;
-	QMSS_CFG_T      qmss_cfg_srio;
-	CPPI_CFG_T      cppi_cfg;
-
-	/* 核间通信初始化 */
-	IPC_init();
-
 	/* Hyperlink interrupt init */
 	Int eventId;
+	int retVal;
 	Hwi_Params params;
 	Error_Block eb;
+
+	/* Hyperlink 初始化 */
+	/* Hyperlink is not up yet, so we don't have to worry about concurrence */
+	memset (&HyplinkDataDsp1Dsp2Buffer, 0, sizeof(HyplinkDataDsp1Dsp2Buffer));
+
+	/* Set up the system PLL, PSC, and DDR as required for this HW */
+	System_printf ("About to do system setup (PLL, PSC, and DDR)\n");
+	if ((retVal = hyplnkExampleSysSetup()) != hyplnk_RET_OK) {
+		System_printf ("system setup failed (%d)\n", (int)retVal);
+		exit(1);
+	}
+	System_printf ("system setup worked\n");
+
+	/* Hyperlink ISR 初始化 */
+//	hyplnkExampleInstallIsr();
 
 	// Initialize the error block
 	Error_init(&eb);
@@ -404,19 +394,6 @@ int MainThread()
 	// as the function.
 	Hwi_create(6, &CpIntc_dispatch, &params, &eb);
 
-	/* Hyperlink 初始化 */
-	/* Hyperlink is not up yet, so we don't have to worry about concurrence */
-	memset (&HyplinkDataDsp1ToDsp2ToSend, 0, sizeof(HyplinkDataDsp1ToDsp2ToSend));
-
-//	/* Set up the system PLL, PSC, and DDR as required for this HW */
-//	System_printf ("About to do Hyperlink system setup (PLL, PSC, and DDR)\n");
-//	if ((retVal = hyplnkExampleSysSetup()) != hyplnk_RET_OK) {
-//		System_printf ("Hyperlink system setup failed (%d)\n", (int)retVal);
-//		exit(1);
-//	}
-//	System_printf ("Hyperlink system setup worked\n");
-//
-//
 //	/* Enable the peripheral */
 //	System_printf ("About to set up HyperLink Peripheral\n");
 //	if ((retVal = hyplnkExamplePeriphSetup()) != hyplnk_RET_OK) {
@@ -425,11 +402,51 @@ int MainThread()
 //	}
 //	System_printf ("HyperLink Peripheral setup worked\n");
 //
+//
 //	/* Set up address mapsrc */
-//	if ((retVal = hyplnkExampleAddrMap (&HyplinkDataDsp1ToDsp2ToSend, (void **)&bufferThroughHypLnk)) != hyplnk_RET_OK) {
+//	if ((retVal = hyplnkExampleAddrMap (&HyplinkDataDsp1Dsp2Buffer, (void **)&bufferThroughHypLnk)) != hyplnk_RET_OK) {
 //		System_printf ("Address map setup failed (%d)\n", (int)retVal);
 //		exit(1);
 //	}
+
+}
+
+
+/* Timer ISR */
+extern void ManualModeTimerIsr();
+
+
+
+//---------------------------------------------------------------------
+// Main Entry Point
+//---------------------------------------------------------------------
+int main()
+{
+	/* Hyperlink初始化 */
+	HyperlinkInit();
+
+	EVM_init();
+
+	/* Start the BIOS 6 Scheduler */
+	BIOS_start ();
+}
+
+//
+// Main Thread
+//
+int MainThread()
+{
+	int status;
+	int             rc;
+	HANDLE          hCfg;
+	QMSS_CFG_T      qmss_cfg_ndk;
+	QMSS_CFG_T      qmss_cfg_srio;
+	CPPI_CFG_T      cppi_cfg;
+
+
+
+	/* 核间通信初始化 */
+	IPC_init();
 
 
 
@@ -497,6 +514,12 @@ int MainThread()
 	//Tell core1 qmss and cppi are initialized
 //	CSL_IPC_genHostInterrupt(IPCGRH_SRC_ID);
 	status = Notify_sendEvent(PROC_ID_CORE1, LINE_ID_CORE0_CORE1, EVENT_ID_CORE0_CORE1, QMSS_RDY_NOTIFY, TRUE);
+	if(status < 0)
+		System_abort("Notify_sendEvent failed.\n");
+	System_printf("Notify_sendEvent(QMSS_RDY_NOTIFY) finished.\n");
+
+
+
 
 	//Wait for CORE0 Srio_start() finished
 

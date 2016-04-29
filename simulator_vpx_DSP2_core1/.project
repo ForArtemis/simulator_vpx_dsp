@@ -81,6 +81,13 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>CustomHeaderDsp2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/CustomHeaderDsp2.h</locationURI>
+		</link>
+	</linkedResources>
 	<variableList>
 		<variable>
 			<name>AIF2_INSTALL_PATH</name>
