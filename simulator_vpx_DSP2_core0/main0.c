@@ -60,7 +60,7 @@ MsgCore2ToCore34567*	Msg2To34567Ptr;
  * If this is placed in MSMC or DDR RAM, then the SMS
  * or SES MPAX must be configured to allow the access.
  */
-#pragma DATA_SECTION (HyplinkDataDsp1Dsp2Buffer, ".bss:remoteable");
+#pragma DATA_SECTION (HyplinkDataDsp1Dsp2Buffer, "hyperlink");
 #pragma DATA_ALIGN (HyplinkDataDsp1Dsp2Buffer, hyplnk_EXAMPLE_LINE_SIZE);
 HyplinkDataDsp1Dsp2 HyplinkDataDsp1Dsp2Buffer;
 /*
@@ -76,6 +76,80 @@ void HyperlinkIsr()
 
 }
 
+/* 初始化Hyperlink */
+void HyperlinkInit()
+{
+	TSCL = 0;
+	TSCH = 0;
+
+	int retVal;
+
+	/* Set up the system PLL, PSC, and DDR as required for this HW */
+	System_printf ("About to do Hyperlink system setup (PLL, PSC, and DDR)\n");
+	if ((retVal = hyplnkExampleSysSetup()) != hyplnk_RET_OK) {
+		System_printf ("Hyperlink system setup failed (%d)\n", (int)retVal);
+		exit(1);
+	}
+	System_printf ("Hyperlink system setup worked\n");
+
+
+	/* Hyperlink interrupt init */
+	Int eventId;
+	Hwi_Params params;
+	Error_Block eb;
+
+	// Initialize the error block
+	Error_init(&eb);
+
+	// Map system interrupt 111 to host interrupt 10 on Intc 0
+	CpIntc_mapSysIntToHostInt(0, CSL_INTC0_VUSR_INT_O, 10);
+
+	// Plug the function and argument for System interrupt 15 then enable it
+	CpIntc_dispatchPlug(CSL_INTC0_VUSR_INT_O, &HyperlinkIsr, 0, TRUE);
+
+	// Enable Host interrupt 10 on Intc 0
+	CpIntc_enableHostInt(0, 10);
+
+	// Get the eventId associated with Host interrupt 10
+	eventId = CpIntc_getEventId(10);
+
+	// Initialize the Hwi parameters
+	Hwi_Params_init(&params);
+
+	// Set the eventId associated with the Host Interrupt
+	params.eventId = eventId;
+
+	// The arg must be set to the Host interrupt
+	params.arg = 10;
+
+	// Enable the interrupt vector
+	params.enableInt = TRUE;
+
+	// Create the Hwi on interrupt 5 then specify 'CpIntc_dispatch'
+	// as the function.
+	Hwi_create(6, &CpIntc_dispatch, &params, &eb);
+
+
+
+	/* Enable the peripheral */
+	System_printf ("About to set up HyperLink Peripheral\n");
+	if ((retVal = hyplnkExamplePeriphSetup()) != hyplnk_RET_OK) {
+		System_printf ("HyperLink system setup failed (%d)\n", (int)retVal);
+		exit(1);
+	}
+	System_printf ("HyperLink Peripheral setup worked\n");
+
+	/* Hyperlink 初始化 */
+	/* Hyperlink is not up yet, so we don't have to worry about concurrence */
+	memset (&HyplinkDataDsp1Dsp2Buffer, 0, sizeof(HyplinkDataDsp1Dsp2Buffer));
+
+	/* Set up address mapsrc */
+	if ((retVal = hyplnkExampleAddrMap (&HyplinkDataDsp1Dsp2Buffer, (void **)&bufferThroughHypLnk)) != hyplnk_RET_OK) {
+		System_printf ("Address map setup failed (%d)\n", (int)retVal);
+		exit(1);
+	}
+
+}
 
 /* Initialize IPC and MessageQ */
 //void IPC_init()
@@ -187,78 +261,19 @@ void HyperlinkIsr()
 
 void MainThread()
 {
-	int i, retVal;
 	int status;
 	int CoreNum;
 	String 	HeapBufMPStringFromCore2;
 	String 	MessageQStringFromCore2;
 	String	MessageQStringToCore1;
 
+
+
 	/* Initialize IPC and MessageQ */
 //	IPC_init();
 
-	/* Hyperlink interrupt init */
-	Int eventId;
-	Hwi_Params params;
-	Error_Block eb;
+	HyperlinkInit();
 
-	// Initialize the error block
-	Error_init(&eb);
-
-	// Map system interrupt 111 to host interrupt 10 on Intc 0
-	CpIntc_mapSysIntToHostInt(0, CSL_INTC0_VUSR_INT_O, 10);
-
-	// Plug the function and argument for System interrupt 15 then enable it
-	CpIntc_dispatchPlug(CSL_INTC0_VUSR_INT_O, &HyperlinkIsr, 0, TRUE);
-
-	// Enable Host interrupt 10 on Intc 0
-	CpIntc_enableHostInt(0, 10);
-
-	// Get the eventId associated with Host interrupt 10
-	eventId = CpIntc_getEventId(10);
-
-	// Initialize the Hwi parameters
-	Hwi_Params_init(&params);
-
-	// Set the eventId associated with the Host Interrupt
-	params.eventId = eventId;
-
-	// The arg must be set to the Host interrupt
-	params.arg = 10;
-
-	// Enable the interrupt vector
-	params.enableInt = TRUE;
-
-	// Create the Hwi on interrupt 5 then specify 'CpIntc_dispatch'
-	// as the function.
-	Hwi_create(6, &CpIntc_dispatch, &params, &eb);
-
-	/* Hyperlink 初始化 */
-	/* Hyperlink is not up yet, so we don't have to worry about concurrence */
-	memset (&HyplinkDataDsp1Dsp2Buffer, 0, sizeof(HyplinkDataDsp1Dsp2Buffer));
-
-	/* Set up the system PLL, PSC, and DDR as required for this HW */
-	System_printf ("About to do Hyperlink system setup (PLL, PSC, and DDR)\n");
-	if ((retVal = hyplnkExampleSysSetup()) != hyplnk_RET_OK) {
-		System_printf ("Hyperlink system setup failed (%d)\n", (int)retVal);
-		exit(1);
-	}
-	System_printf ("Hyperlink system setup worked\n");
-
-
-	/* Enable the peripheral */
-	System_printf ("About to set up HyperLink Peripheral\n");
-	if ((retVal = hyplnkExamplePeriphSetup()) != hyplnk_RET_OK) {
-		System_printf ("HyperLink system setup failed (%d)\n", (int)retVal);
-		exit(1);
-	}
-	System_printf ("HyperLink Peripheral setup worked\n");
-
-	/* Set up address mapsrc */
-	if ((retVal = hyplnkExampleAddrMap (&HyplinkDataDsp1Dsp2Buffer, (void **)&bufferThroughHypLnk)) != hyplnk_RET_OK) {
-		System_printf ("Address map setup failed (%d)\n", (int)retVal);
-		exit(1);
-	}
 
 	while(1)
 	{

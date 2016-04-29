@@ -951,7 +951,12 @@ hyplnkRet_e hyplnkExamplePeriphSetup (void)
   getRegs.serdesControl1 = NULL;
 
   /* Wait for peripheral to come up */
-  wait_start = hyplnkExampleReadTime();
+//  wait_start = hyplnkExampleReadTime();
+  wait_start = _itoll(TSCH,TSCL);
+  uint32_t low = TSCL;
+  uint32_t high = TSCH;
+  System_printf("TSCL = %d, TSCH = %d", low, high);
+
   do {
     if ((retVal = Hyplnk_readRegs (handle, hyplnk_LOCATION_LOCAL, &getRegs)) != hyplnk_RET_OK) {
       System_printf ("Read status failed!\n");
@@ -983,7 +988,13 @@ hyplnkRet_e hyplnkExamplePeriphSetup (void)
   System_printf ("Waiting 5 seconds to check link stability\n");
   hyplnkExampleCheckOneStat (hyplnk_LOCATION_LOCAL, "before stability wait", 0);
   wait_start = hyplnkExampleReadTime();
-  while ((hyplnkExampleReadTime() - wait_start) < (uint64_t)hyplnk_EXAMPLE_WAIT_STABILITY_TIME);
+//  while ((hyplnkExampleReadTime() - wait_start) < (uint64_t)hyplnk_EXAMPLE_WAIT_STABILITY_TIME);
+  uint64_t temp = 0;
+  while (temp < (uint64_t)hyplnk_EXAMPLE_WAIT_STABILITY_TIME)
+  {
+	  temp = hyplnkExampleReadTime() - wait_start;
+	  temp = hyplnkExampleReadTime();
+  }
 #ifdef hyplnk_EXAMPLE_EQ_ANALYSIS
   hyplnkExampleCheckOneStat (hyplnk_LOCATION_LOCAL, "before eq analysis", 0);
   hyplnkExampleEQAnalysis();
