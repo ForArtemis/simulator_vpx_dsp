@@ -332,11 +332,15 @@ void MainThread()
 		else if(((Msg0To2Ptr->TargetFrameId) & 0x0000ffff) == RANGE_SPREAD_TARGET_0)
 		{
 			RangeSpreadTargetParam0Cal(Msg0To2Ptr, Msg2To1Ptr, Msg2To3Ptr, Msg2To0Ptr, ScatteringPointPtr);
-			//回传数据
-			status = MessageQ_put(QueueIdCore2ToCore0, &(Msg2To0Ptr->header));
-			if (status < 0)
+			if(((Msg0To2Ptr->TargetFrameId >> 16) == MANUAL_MODE) ||
+					((Msg0To2Ptr->TargetFrameId >> 16) == AUTO_MODE_PASS_BACK))
 			{
-				System_abort("MessageQ_put had a failure/error\n");
+				//回传数据
+				status = MessageQ_put(QueueIdCore2ToCore0, &(Msg2To0Ptr->header));
+				if (status < 0)
+				{
+					System_abort("MessageQ_put had a failure/error\n");
+				}
 			}
 			System_printf("RANGE_SPREAD_TARGET_0\n");
 		}
@@ -344,11 +348,15 @@ void MainThread()
 		else if(((Msg0To2Ptr->TargetFrameId) & 0x0000ffff) == RANGE_SPREAD_TARGET_1)
 		{
 			RangeSpreadTargetParam1Cal(Msg0To2Ptr, Msg2To1Ptr, Msg2To3Ptr, Msg2To0Ptr, ScatteringPointPtr);
-			//回传数据
-			status = MessageQ_put(QueueIdCore2ToCore0, &(Msg2To0Ptr->header));
-			if (status < 0)
+			if(((Msg0To2Ptr->TargetFrameId >> 16) == MANUAL_MODE) ||
+					((Msg0To2Ptr->TargetFrameId >> 16) == AUTO_MODE_PASS_BACK))
 			{
-				System_abort("MessageQ_put had a failure/error\n");
+				//回传数据
+				status = MessageQ_put(QueueIdCore2ToCore0, &(Msg2To0Ptr->header));
+				if (status < 0)
+				{
+					System_abort("MessageQ_put had a failure/error\n");
+				}
 			}
 			System_printf("RANGE_SPREAD_TARGET_1\n");
 		}
@@ -356,11 +364,15 @@ void MainThread()
 		else if(((Msg0To2Ptr->TargetFrameId) & 0x0000ffff) == RANGE_SPREAD_TARGET_2)
 		{
 			RangeSpreadTargetParam2Cal(Msg0To2Ptr, Msg2To1Ptr, Msg2To3Ptr, Msg2To0Ptr, ScatteringPointPtr);
-			//回传数据
-			status = MessageQ_put(QueueIdCore2ToCore0, &(Msg2To0Ptr->header));
-			if (status < 0)
+			if(((Msg0To2Ptr->TargetFrameId >> 16) == MANUAL_MODE) ||
+					((Msg0To2Ptr->TargetFrameId >> 16) == AUTO_MODE_PASS_BACK))
 			{
-				System_abort("MessageQ_put had a failure/error\n");
+				//回传数据
+				status = MessageQ_put(QueueIdCore2ToCore0, &(Msg2To0Ptr->header));
+				if (status < 0)
+				{
+					System_abort("MessageQ_put had a failure/error\n");
+				}
 			}
 			System_printf("RANGE_SPREAD_TARGET_2\n");
 		}

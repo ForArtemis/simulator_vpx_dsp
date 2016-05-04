@@ -320,18 +320,15 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 	float	RadarCoordPhi;
 	float	TargetRadarX, TargetRadarY, TargetRadarZ;
 	CoordinateCalculateOriginToTrans(
-					GroundCoordToTargetCoordAngleX, GroundCoordToRadarCoordAngleY, GroundCoordToTargetCoordAngleZ,
-					Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordTargetX,
-					Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordTargetY,
-					Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordTargetZ,
+					GroundCoordToRadarCoordAngleX, GroundCoordToRadarCoordAngleY, GroundCoordToRadarCoordAngleZ,
+					Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordTargetX - Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordRadarRecvX,
+					Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordTargetY - Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordRadarRecvY,
+					Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordTargetZ - Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordRadarRecvZ,
 					&TargetRadarX,
 					&TargetRadarY,
 					&TargetRadarZ
 					);
 	//计算得出阵面坐标系下目标的坐标
-	TargetRadarX -= Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordRadarRecvX;
-	TargetRadarY -= Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordRadarRecvY;
-	TargetRadarZ -= Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.GroundCoordRadarRecvZ;
 	RadarCoordTheta = atan(TargetRadarZ/TargetRadarX);
 	RadarCoordPhi = atan(TargetRadarY / sqrt(TargetRadarX*TargetRadarX + TargetRadarZ*TargetRadarZ));
 

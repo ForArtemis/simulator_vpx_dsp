@@ -355,10 +355,27 @@ typedef struct
 	float	RepeatWidth;
 	float	RepeatStartTime;
 	float	RepeatNum;
+	float   GroundCoordRadarTranX;
+	float   GroundCoordRadarTranY;
+	float   GroundCoordRadarTranZ;
+	float   GroundCoordRadarRecvX;
+	float   GroundCoordRadarRecvY;
+	float   GroundCoordRadarRecvZ;
+	float 	GroundCoordToRadarCoordAngleX;
+	float 	GroundCoordToRadarCoordAngleY;
+	float 	GroundCoordToRadarCoordAngleZ;
 }JammingIsrjParam1;
 
 typedef struct
 {
+	float	JammingDistance;
+	float	JammingTheta;
+	float	JammingPhi;
+}JammingIsrjParam1Back;
+
+typedef struct
+{
+	int		TargetFrameId;
 	int		JammingFrameId;
 	union
 	{
@@ -367,8 +384,10 @@ typedef struct
 	}JammingParamDsp1ToDsp2;
 	union
 	{
-		float				JammingIsrjParam1HyplinkBack;
+		char					JammingIsrjParam0HyplinkBack;
+		JammingIsrjParam1Back	JammingIsrjParam1HyplinkBack;
 	}JammingParamDsp2ToDsp1;
+	int		NewFlag;	//为1则表示新的一波数据
 }HyplinkDataDsp1Dsp2;
 
 /* 工作参数设定帧  */
@@ -407,8 +426,9 @@ typedef struct
     int		JammingFrameId;
     union
     {
-        char	NoJammingBack;
-        char	IsrjParam0Back;
+        char					NoJammingBack;
+        char					IsrjParam0Back;
+        JammingIsrjParam1Back	IsrjParam1Back;
     }JammingParamBack;
     float	NoisePower;
 }WorkParamSetBack;
@@ -426,7 +446,7 @@ typedef struct
 typedef struct
 {
 	int		PointNum;
-	Point	PointData[1024];	//最大散射点数
+	Point	PointData[128];	//最大散射点数
 }ScatteringPoint;
 
 /* 散射点信息导入帧 */

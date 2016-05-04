@@ -175,6 +175,7 @@ int UdpFunc( SOCKET s, UINT32 unused )
 		memcpy(	bufferThroughHypLnk,
 				&(WorkParamUdpFramePtr->JammingFrameId),
 				sizeof(HyplinkDataDsp1Dsp2) - sizeof(bufferThroughHypLnk->JammingParamDsp2ToDsp1));
+		bufferThroughHypLnk->NewFlag = 1;
 		MessageQ_setMsgId(&(Msg0To2Ptr->header), MsgID++);
 
 
@@ -300,6 +301,7 @@ int UdpFunc( SOCKET s, UINT32 unused )
 
 			CACHE_invL1d(Msg2To0Ptr, sizeof(MsgCore2ToCore0), CACHE_WAIT);	//从cache中invalid
 
+			while(bufferThroughHypLnk->NewFlag == 1);	//等待DSP2接受到Hyperlink数据
 			//无干扰
 			if(WorkParamUdpFramePtr->JammingFrameId == NO_JAMMING)
 			{
@@ -309,18 +311,23 @@ int UdpFunc( SOCKET s, UINT32 unused )
 			//间歇采样转发，参数0
 			else if(WorkParamUdpFramePtr->JammingFrameId == ISRJ_0)
 			{
-
+				WorkParamSetBackFrame.JammingFrameId = WorkParamUdpFramePtr->JammingFrameId;
+				WorkParamSetBackFrame.JammingParamBack.IsrjParam0Back =
+						bufferThroughHypLnk->JammingParamDsp2ToDsp1.JammingIsrjParam0HyplinkBack;
 			}
 			//间歇采样转发，参数1
 			else if(WorkParamUdpFramePtr->JammingFrameId == ISRJ_1)
 			{
-
+				WorkParamSetBackFrame.JammingFrameId = WorkParamUdpFramePtr->JammingFrameId;
+				WorkParamSetBackFrame.JammingParamBack.IsrjParam1Back.JammingDistance =
+						bufferThroughHypLnk->JammingParamDsp2ToDsp1.JammingIsrjParam1HyplinkBack.JammingDistance;
+				WorkParamSetBackFrame.JammingParamBack.IsrjParam1Back.JammingTheta =
+										bufferThroughHypLnk->JammingParamDsp2ToDsp1.JammingIsrjParam1HyplinkBack.JammingTheta;
+				WorkParamSetBackFrame.JammingParamBack.IsrjParam1Back.JammingPhi =
+										bufferThroughHypLnk->JammingParamDsp2ToDsp1.JammingIsrjParam1HyplinkBack.JammingPhi;
 			}
-			//间歇采样转发，参数2
-			else if(WorkParamUdpFramePtr->JammingFrameId == ISRJ_2)
-			{
-
-			}
+			CACHE_invL1d(&bufferThroughHypLnk->JammingParamDsp2ToDsp1,
+							sizeof(bufferThroughHypLnk->JammingParamDsp2ToDsp1) + 64, CACHE_WAIT);	//从cache中invalid
 
 			//回传数据
 			sendto(s, &WorkParamSetBackFrame, sizeof(WorkParamSetBack), MSG_WAITALL, (PSA)&SocketAddrData, plen);

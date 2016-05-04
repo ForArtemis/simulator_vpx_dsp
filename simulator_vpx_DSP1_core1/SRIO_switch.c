@@ -166,7 +166,7 @@ int rio_discovery_fabric(Uint32 uiLocalPort)
 	System_printf("This host device is attached to port %d \n", swport);
 
 	/********************************************
-	 STEP 2: Read back the HBDIDL on the switch
+	 STEP 2: Read back the HBDIDL(Host Base deviceID Lock CSR) on the switch
 	 This lock register determines which
 	 device initialized the device. 0xFFFF indicates
 	 that the device has not yet been initialized, if the

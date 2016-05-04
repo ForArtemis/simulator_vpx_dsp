@@ -704,7 +704,9 @@ Void MainThread(void)
 	Srio_SockBindAddrInfo   SrioSockBindInfo;
 	Srio_SockAddrInfo       *SrioSockInfo;
 	SrioFrame0 				*SrioFrame0SendPtr;
-	SrioFrame1				*SrioFrame1SendPtr;
+	SrioFrame1				*SrioFrame1SendPtr0;
+	SrioFrame1				*SrioFrame1SendPtr1;
+	SrioFrame1				*SrioFrame1SendPtr2;
 
 	SrioSockInfo = (Srio_SockAddrInfo*)malloc(sizeof(Srio_SockAddrInfo));
 	System_printf("SrioSockInfo malloc size is %d.\n", sizeof(Srio_SockAddrInfo));
@@ -718,9 +720,21 @@ Void MainThread(void)
 	{
 		System_printf("SrioFrame0 malloc failed./n");
 	}
-	SrioFrame1SendPtr = (SrioFrame1*)malloc(sizeof(SrioFrame1));
+	SrioFrame1SendPtr0 = (SrioFrame1*)malloc(sizeof(SrioFrame1));
 	System_printf("SrioFrame1 malloc size is %d.\n", sizeof(SrioFrame1));
-	if(!SrioFrame1SendPtr)//如果malloc失败
+	if(!SrioFrame1SendPtr0)//如果malloc失败
+	{
+		System_printf("SrioFrame1 malloc failed./n");
+	}
+	SrioFrame1SendPtr1 = (SrioFrame1*)malloc(sizeof(SrioFrame1));
+	System_printf("SrioFrame1 malloc size is %d.\n", sizeof(SrioFrame1));
+	if(!SrioFrame1SendPtr1)//如果malloc失败
+	{
+		System_printf("SrioFrame1 malloc failed./n");
+	}
+	SrioFrame1SendPtr2 = (SrioFrame1*)malloc(sizeof(SrioFrame1));
+	System_printf("SrioFrame1 malloc size is %d.\n", sizeof(SrioFrame1));
+	if(!SrioFrame1SendPtr2)//如果malloc失败
 	{
 		System_printf("SrioFrame1 malloc failed./n");
 	}
@@ -965,31 +979,44 @@ Void MainThread(void)
 			{
 				SrioFrame0SendPtr->RangeProfile[i] = Msg2To1Ptr->RangeProfile[i];
 			}
-//			for(i = 0 ; i < 20 ; i++)
-//			{
-//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg3To1Ptr->OrientationVectorImag[i];
-//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg3To1Ptr->OrientationVectorReal[i];
-//			}
-//			for(i = 20 ; i < 40 ; i++)
-//			{
-//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg4To1Ptr->OrientationVectorImag[i];
-//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg4To1Ptr->OrientationVectorReal[i];
-//			}
-//			for(i = 40 ; i < 60 ; i++)
-//			{
-//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg5To1Ptr->OrientationVectorImag[i];
-//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg5To1Ptr->OrientationVectorReal[i];
-//			}
-//			for(i = 60 ; i <80 ; i++)
-//			{
-//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg6To1Ptr->OrientationVectorImag[i];
-//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg6To1Ptr->OrientationVectorReal[i];
-//			}
-//			for(i = 80 ; i < 96 ; i++)
-//			{
-//				SrioFrame2SendPtr->OrientationVectorImag[i] = Msg7To1Ptr->OrientationVectorImag[i];
-//				SrioFrame1SendPtr->OrientationVectorReal[i] = Msg7To1Ptr->OrientationVectorReal[i];
-//			}
+			//0~31
+			for(i = 0 ; i < 20 ; i++)
+			{
+				SrioFrame1SendPtr0->OrientationVectorImag[i] = Msg3To1Ptr->OrientationVectorImag[i];
+				SrioFrame1SendPtr0->OrientationVectorReal[i] = Msg3To1Ptr->OrientationVectorReal[i];
+			}
+			for(i = 0 ; i < 12 ; i++)
+			{
+				SrioFrame1SendPtr0->OrientationVectorImag[20 + i] = Msg4To1Ptr->OrientationVectorImag[i];
+				SrioFrame1SendPtr0->OrientationVectorReal[20 + i] = Msg4To1Ptr->OrientationVectorReal[i];
+			}
+			//32~63
+			for(i = 12 ; i < 20 ; i++)
+			{
+				SrioFrame1SendPtr1->OrientationVectorImag[i - 12] = Msg4To1Ptr->OrientationVectorImag[i];
+				SrioFrame1SendPtr1->OrientationVectorReal[i - 12] = Msg4To1Ptr->OrientationVectorReal[i];
+			}
+			for(i = 0 ; i < 20 ; i++)
+			{
+				SrioFrame1SendPtr1->OrientationVectorImag[i + 8] = Msg4To1Ptr->OrientationVectorImag[i];
+				SrioFrame1SendPtr1->OrientationVectorReal[i + 8] = Msg4To1Ptr->OrientationVectorReal[i];
+			}
+			for(i = 0 ; i < 4 ; i++)
+			{
+				SrioFrame1SendPtr1->OrientationVectorImag[i + 28] = Msg4To1Ptr->OrientationVectorImag[i];
+				SrioFrame1SendPtr1->OrientationVectorReal[i + 28] = Msg4To1Ptr->OrientationVectorReal[i];
+			}
+			//64~95
+			for(i = 4 ; i < 20 ; i++)
+			{
+				SrioFrame1SendPtr2->OrientationVectorImag[i - 4] = Msg4To1Ptr->OrientationVectorImag[i];
+				SrioFrame1SendPtr2->OrientationVectorReal[i - 4] = Msg4To1Ptr->OrientationVectorReal[i];
+			}
+			for(i = 0 ; i < 16 ; i++)
+			{
+				SrioFrame1SendPtr2->OrientationVectorImag[i + 16] = Msg4To1Ptr->OrientationVectorImag[i];
+				SrioFrame1SendPtr2->OrientationVectorReal[i + 16] = Msg4To1Ptr->OrientationVectorReal[i];
+			}
     	}
 
 		/* Populate the DIO Address Information where the data is to be sent. */
@@ -1004,20 +1031,39 @@ Void MainThread(void)
 		memcpy(SrioMemoryPtr, SrioFrame0SendPtr->RangeProfile, sizeof(SrioFrame0));
 		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 128, SrioSockInfo);
 
-//		SrioSockInfo->dio.rapidIOLSB    = 0x00000080 >> 3; 	//FPGA中RAN为64位
-//		memcpy(SrioMemoryPtr, (SrioFrame1SendPtr->OrientationVectorReal), sizeof(SrioFrame1));
-//		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
-//
-//		SrioSockInfo->dio.rapidIOLSB    = 0x00000180 >> 3;	//FPGA中RAN为64位
-//		memcpy(SrioMemoryPtr, (SrioFrame2SendPtr->OrientationVectorImag), sizeof(SrioFrame2));
-//		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
 
-//		while((status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, (sizeof(Uint32) + sizeof(Uint16) + sizeof(Uint16) + sizeof(Uint16)*10), SrioSockInfo)) != 0) ;
-//		if(status != 0)
-//		{
-//			System_printf("Error code is %d.\n", status);
-//			System_printf("Srio_sockSend_DIO() error!!! \n");
-//		}
+		/* Populate the DIO Address Information where the data is to be sent. */
+		SrioSockInfo->dio.rapidIOMSB    = 0;
+		SrioSockInfo->dio.rapidIOLSB    = 0x00000001;
+		SrioSockInfo->dio.dstID         = DEVICE_ID4_16BIT;
+		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
+//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
+		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
+		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
+		memcpy(SrioMemoryPtr, SrioFrame1SendPtr0, sizeof(SrioFrame1));
+		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
+
+		/* Populate the DIO Address Information where the data is to be sent. */
+		SrioSockInfo->dio.rapidIOMSB    = 0;
+		SrioSockInfo->dio.rapidIOLSB    = 0x00000002;
+		SrioSockInfo->dio.dstID         = DEVICE_ID4_16BIT;
+		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
+//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
+		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
+		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
+		memcpy(SrioMemoryPtr, SrioFrame1SendPtr0, sizeof(SrioFrame1));
+		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
+
+		/* Populate the DIO Address Information where the data is to be sent. */
+		SrioSockInfo->dio.rapidIOMSB    = 0;
+		SrioSockInfo->dio.rapidIOLSB    = 0x00000003;
+		SrioSockInfo->dio.dstID         = DEVICE_ID4_16BIT;
+		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
+//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
+		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
+		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
+		memcpy(SrioMemoryPtr, SrioFrame1SendPtr0, sizeof(SrioFrame1));
+		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
 
 		System_printf("Srio_sockSend_DIO(). \n");
     }

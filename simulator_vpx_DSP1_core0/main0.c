@@ -360,54 +360,54 @@ void HyperlinkInit()
 	}
 	System_printf ("system setup worked\n");
 
-	/* Hyperlink ISR 初始化 */
-//	hyplnkExampleInstallIsr();
-
-	// Initialize the error block
-	Error_init(&eb);
-
-	// Map system interrupt 111 to host interrupt 10 on Intc 0
-	CpIntc_mapSysIntToHostInt(0, CSL_INTC0_VUSR_INT_O, 10);
-
-	// Plug the function and argument for System interrupt 15 then enable it
-	CpIntc_dispatchPlug(CSL_INTC0_VUSR_INT_O, &HyperlinkIsr, 0, TRUE);
-
-	// Enable Host interrupt 10 on Intc 0
-	CpIntc_enableHostInt(0, 10);
-
-	// Get the eventId associated with Host interrupt 10
-	eventId = CpIntc_getEventId(10);
-
-	// Initialize the Hwi parameters
-	Hwi_Params_init(&params);
-
-	// Set the eventId associated with the Host Interrupt
-	params.eventId = eventId;
-
-	// The arg must be set to the Host interrupt
-	params.arg = 10;
-
-	// Enable the interrupt vector
-	params.enableInt = TRUE;
-
-	// Create the Hwi on interrupt 5 then specify 'CpIntc_dispatch'
-	// as the function.
-	Hwi_create(6, &CpIntc_dispatch, &params, &eb);
-
-//	/* Enable the peripheral */
-//	System_printf ("About to set up HyperLink Peripheral\n");
-//	if ((retVal = hyplnkExamplePeriphSetup()) != hyplnk_RET_OK) {
-//		System_printf ("HyperLink system setup failed (%d)\n", (int)retVal);
-//		exit(1);
-//	}
-//	System_printf ("HyperLink Peripheral setup worked\n");
+//	/* Hyperlink ISR 初始化 */
+////	hyplnkExampleInstallIsr();
 //
+//	// Initialize the error block
+//	Error_init(&eb);
 //
-//	/* Set up address mapsrc */
-//	if ((retVal = hyplnkExampleAddrMap (&HyplinkDataDsp1Dsp2Buffer, (void **)&bufferThroughHypLnk)) != hyplnk_RET_OK) {
-//		System_printf ("Address map setup failed (%d)\n", (int)retVal);
-//		exit(1);
-//	}
+//	// Map system interrupt 111 to host interrupt 10 on Intc 0
+//	CpIntc_mapSysIntToHostInt(0, CSL_INTC0_VUSR_INT_O, 10);
+//
+//	// Plug the function and argument for System interrupt 15 then enable it
+//	CpIntc_dispatchPlug(CSL_INTC0_VUSR_INT_O, &HyperlinkIsr, 0, TRUE);
+//
+//	// Enable Host interrupt 10 on Intc 0
+//	CpIntc_enableHostInt(0, 10);
+//
+//	// Get the eventId associated with Host interrupt 10
+//	eventId = CpIntc_getEventId(10);
+//
+//	// Initialize the Hwi parameters
+//	Hwi_Params_init(&params);
+//
+//	// Set the eventId associated with the Host Interrupt
+//	params.eventId = eventId;
+//
+//	// The arg must be set to the Host interrupt
+//	params.arg = 10;
+//
+//	// Enable the interrupt vector
+//	params.enableInt = TRUE;
+//
+//	// Create the Hwi on interrupt 5 then specify 'CpIntc_dispatch'
+//	// as the function.
+//	Hwi_create(6, &CpIntc_dispatch, &params, &eb);
+
+	/* Enable the peripheral */
+	System_printf ("About to set up HyperLink Peripheral\n");
+	if ((retVal = hyplnkExamplePeriphSetup()) != hyplnk_RET_OK) {
+		System_printf ("HyperLink system setup failed (%d)\n", (int)retVal);
+		exit(1);
+	}
+	System_printf ("HyperLink Peripheral setup worked\n");
+
+
+	/* Set up address mapsrc */
+	if ((retVal = hyplnkExampleAddrMap (&HyplinkDataDsp1Dsp2Buffer, (void **)&bufferThroughHypLnk)) != hyplnk_RET_OK) {
+		System_printf ("Address map setup failed (%d)\n", (int)retVal);
+		exit(1);
+	}
 
 }
 
@@ -423,7 +423,7 @@ extern void ManualModeTimerIsr();
 int main()
 {
 	/* Hyperlink初始化 */
-	HyperlinkInit();
+//	HyperlinkInit();
 
 	EVM_init();
 
