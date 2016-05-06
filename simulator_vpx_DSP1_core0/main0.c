@@ -423,7 +423,7 @@ extern void ManualModeTimerIsr();
 int main()
 {
 	/* Hyperlink≥ı ºªØ */
-//	HyperlinkInit();
+	HyperlinkInit();
 
 	EVM_init();
 

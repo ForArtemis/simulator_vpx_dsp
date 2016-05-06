@@ -1019,51 +1019,51 @@ Void MainThread(void)
 			}
     	}
 
-		/* Populate the DIO Address Information where the data is to be sent. */
-		SrioSockInfo->dio.rapidIOMSB    = 0;
-		SrioSockInfo->dio.rapidIOLSB    = 0x00000000;
-		SrioSockInfo->dio.dstID         = DEVICE_ID2_16BIT;
-		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
-//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
-		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
-
-		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
-		memcpy(SrioMemoryPtr, SrioFrame0SendPtr->RangeProfile, sizeof(SrioFrame0));
-		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 128, SrioSockInfo);
-
-
-		/* Populate the DIO Address Information where the data is to be sent. */
-		SrioSockInfo->dio.rapidIOMSB    = 0;
-		SrioSockInfo->dio.rapidIOLSB    = 0x00000001;
-		SrioSockInfo->dio.dstID         = DEVICE_ID4_16BIT;
-		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
-//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
-		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
-		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
-		memcpy(SrioMemoryPtr, SrioFrame1SendPtr0, sizeof(SrioFrame1));
-		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
-
-		/* Populate the DIO Address Information where the data is to be sent. */
-		SrioSockInfo->dio.rapidIOMSB    = 0;
-		SrioSockInfo->dio.rapidIOLSB    = 0x00000002;
-		SrioSockInfo->dio.dstID         = DEVICE_ID4_16BIT;
-		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
-//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
-		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
-		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
-		memcpy(SrioMemoryPtr, SrioFrame1SendPtr0, sizeof(SrioFrame1));
-		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
-
-		/* Populate the DIO Address Information where the data is to be sent. */
-		SrioSockInfo->dio.rapidIOMSB    = 0;
-		SrioSockInfo->dio.rapidIOLSB    = 0x00000003;
-		SrioSockInfo->dio.dstID         = DEVICE_ID4_16BIT;
-		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
-//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
-		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
-		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
-		memcpy(SrioMemoryPtr, SrioFrame1SendPtr0, sizeof(SrioFrame1));
-		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
+//		/* Populate the DIO Address Information where the data is to be sent. */
+//		SrioSockInfo->dio.rapidIOMSB    = 0;
+//		SrioSockInfo->dio.rapidIOLSB    = 0x00000000;
+//		SrioSockInfo->dio.dstID         = DEVICE_ID2_16BIT;
+//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
+////		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
+//		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
+//
+//		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
+//		memcpy(SrioMemoryPtr, SrioFrame0SendPtr->RangeProfile, sizeof(SrioFrame0));
+//		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 128, SrioSockInfo);
+//
+//
+//		/* Populate the DIO Address Information where the data is to be sent. */
+//		SrioSockInfo->dio.rapidIOMSB    = 0;
+//		SrioSockInfo->dio.rapidIOLSB    = 0x00000001;
+//		SrioSockInfo->dio.dstID         = DEVICE_ID4_16BIT;
+//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
+////		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
+//		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
+//		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
+//		memcpy(SrioMemoryPtr, SrioFrame1SendPtr0, sizeof(SrioFrame1));
+//		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
+//
+//		/* Populate the DIO Address Information where the data is to be sent. */
+//		SrioSockInfo->dio.rapidIOMSB    = 0;
+//		SrioSockInfo->dio.rapidIOLSB    = 0x00000002;
+//		SrioSockInfo->dio.dstID         = DEVICE_ID4_16BIT;
+//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
+////		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
+//		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
+//		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
+//		memcpy(SrioMemoryPtr, SrioFrame1SendPtr0, sizeof(SrioFrame1));
+//		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
+//
+//		/* Populate the DIO Address Information where the data is to be sent. */
+//		SrioSockInfo->dio.rapidIOMSB    = 0;
+//		SrioSockInfo->dio.rapidIOLSB    = 0x00000003;
+//		SrioSockInfo->dio.dstID         = DEVICE_ID4_16BIT;
+//		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE_R;
+////		SrioSockInfo->dio.ttype         = Srio_Ttype_Write_NWRITE;
+//		SrioSockInfo->dio.ftype         = Srio_Ftype_WRITE;
+//		//Recommended size is 7, 15, 31, 63, 95 (reads only), 127, 159 (reads only), 191(reads only), 223 (reads only), and 255
+//		memcpy(SrioMemoryPtr, SrioFrame1SendPtr0, sizeof(SrioFrame1));
+//		status = Srio_sockSend_DIO(SrioSocket, SrioMemoryPtr, 256, SrioSockInfo);
 
 		System_printf("Srio_sockSend_DIO(). \n");
     }

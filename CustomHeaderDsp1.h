@@ -11,6 +11,7 @@
 #include <xdc/runtime/System.h>
 #include <xdc/runtime/Sysmin.h>
 #include <ti/ipc/MessageQ.h>
+#include <ti/csl/tistdtypes.h>
 //#include <ti/ipc/Notify.h>
 //#include <xdc/runtime/System.h>	//System_printf()
 
@@ -151,15 +152,15 @@
 /* SRIO 数据帧 */
 typedef struct
 {
-	unsigned short 	RangeProfile[RANGE_PROFILE_NUM];
-	unsigned int	DopplerFrePinc;
-	unsigned short  DistanceDelay;
+	Uint16			RangeProfile[RANGE_PROFILE_NUM];
+	Uint32			DopplerFrePinc;
+	Uint16			DistanceDelay;
 //	unsigned short  NoisePower;
 }SrioFrame0;	//除导向性矢量外的参数
 typedef struct
 {
-	unsigned short  OrientationVectorReal[ARRAY_NUM/3];
-	unsigned short  OrientationVectorImag[ARRAY_NUM/3];
+	Uint16			OrientationVectorReal[ARRAY_NUM/3];
+	Uint16			OrientationVectorImag[ARRAY_NUM/3];
 }SrioFrame1;	//导向性矢量参数，包含32个导向性矢量，因为一块DA产生板可以产生32个通道的回波
 
 /* 目标参数  */
@@ -249,7 +250,7 @@ typedef struct
 typedef struct
 {
 	MessageQ_MsgHeader 	header;
-	int	 				TargetFrameId;
+	Uint32	 			TargetFrameId;
 	union
 	{
 		PointTargetParam 			PointTargetParamMsg;
@@ -263,7 +264,7 @@ typedef struct
 typedef struct
 {
 	MessageQ_MsgHeader 	header;
-	int	 				FrameId;
+	Uint32 				FrameId;
 } MsgCore0ToCore1;
 
 typedef struct
@@ -276,19 +277,19 @@ typedef struct
 typedef struct
 {
 	MessageQ_MsgHeader 	header;
-	unsigned short 		ProcId;
-	unsigned short      OrientationVectorReal[20];	//Each core calculate and send 20 orientation vector
-	unsigned short      OrientationVectorImag[20];
+	Uint16		 		ProcId;
+	Uint16		 		OrientationVectorReal[20];	//Each core calculate and send 20 orientation vector
+	Uint16		 		OrientationVectorImag[20];
 } MsgCore34567ToCore1;
 
 /* 计算好要发送给核1的参数 */
 typedef struct
 {
 	MessageQ_MsgHeader 	header;
-	unsigned int 		DopplerFrePinc;
-	unsigned short 		DistanceDelay;
-	unsigned short  	NoisePower;
-	unsigned short      RangeProfile[RANGE_PROFILE_NUM];
+	Uint32		 		DopplerFrePinc;
+	Uint16		 		DistanceDelay;
+	Uint16		 		NoisePower;
+	Uint16		 		RangeProfile[RANGE_PROFILE_NUM];
 } MsgCore2ToCore1;
 
 /* 计算好的角度 */
@@ -375,8 +376,8 @@ typedef struct
 
 typedef struct
 {
-	int		TargetFrameId;
-	int		JammingFrameId;
+	Uint32	TargetFrameId;
+	Uint32	JammingFrameId;
 	union
 	{
 		JammingIsrjParam0	JammingIsrjParam0Hyplink;
@@ -384,17 +385,17 @@ typedef struct
 	}JammingParamDsp1ToDsp2;
 	union
 	{
-		char					JammingIsrjParam0HyplinkBack;
+		Uint8					JammingIsrjParam0HyplinkBack;
 		JammingIsrjParam1Back	JammingIsrjParam1HyplinkBack;
 	}JammingParamDsp2ToDsp1;
-	int		NewFlag;	//为1则表示新的一波数据
+	Uint8	NewFlag;	//为1则表示新的一波数据
 }HyplinkDataDsp1Dsp2;
 
 /* 工作参数设定帧  */
 typedef struct
 {
-	int		FrameId;
-	int		TargetFrameId;
+	Uint32	FrameId;
+	Uint32	TargetFrameId;
 	union
 	{
 		PointTargetParam 		TargetParam0Data;
@@ -402,7 +403,7 @@ typedef struct
 		RangeSpreadTargetParam1	RangeSpreadTargetParam1Data;
 		RangeSpreadTargetParam2	RangeSpreadTargetParam2Data;
 	}TargetFrame;
-	int		JammingFrameId;
+	Uint32	JammingFrameId;
 	union
 	{
 		JammingIsrjParam0		JammingIsrjParam0Data;
@@ -415,19 +416,19 @@ typedef struct
 /* 网口工作参数设置回传数据 */
 typedef struct
 {
-	int		FrameId;
-    int		TargetFrameId;
+	Uint32	FrameId;
+    Uint32	TargetFrameId;
     union	WorkParamSetBack
     {
         char	PointTargetBack;
         RangeSpreadTargetParam0SetBack	RangeSpreadTargetParam0SetBackFrame;
         RangeSpreadTargetParam12SetBack	RangeSpreadTargetParam12SetBackFrame;
     }TargetParamBack;
-    int		JammingFrameId;
+    Uint32	JammingFrameId;
     union
     {
-        char					NoJammingBack;
-        char					IsrjParam0Back;
+        Uint8					NoJammingBack;
+        Uint8					IsrjParam0Back;
         JammingIsrjParam1Back	IsrjParam1Back;
     }JammingParamBack;
     float	NoisePower;
@@ -445,14 +446,14 @@ typedef struct
 
 typedef struct
 {
-	int		PointNum;
+	Uint32	PointNum;
 	Point	PointData[128];	//最大散射点数
 }ScatteringPoint;
 
 /* 散射点信息导入帧 */
 typedef struct
 {
-	int				FrameId;
+	Uint32			FrameId;
 	ScatteringPoint	ScatteringPointData;
 }ScatteringPointUdpFrame;
 
