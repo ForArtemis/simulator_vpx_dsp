@@ -285,9 +285,9 @@ int32_t SrioDevice_init (void)
     /* Configure the Base Routing Register to ensure that all packets matching the 
      * Device Identifier & the Secondary Device Id are admitted. */
     //++++ edit by LRH ++++
-    CSL_SRIO_SetTLMPortBaseRoutingPatternMatch(hSrio, SRIO_PORT_NUM, 1, DEVICE_ID2_16BIT, 0xFFFF);
-    CSL_SRIO_SetTLMPortBaseRoutingPatternMatch(hSrio, SRIO_PORT_NUM, 2, DEVICE_ID3_16BIT, 0xFFFF);
-    CSL_SRIO_SetTLMPortBaseRoutingPatternMatch(hSrio, SRIO_PORT_NUM, 3, DEVICE_ID4_16BIT, 0xFFFF);
+//    CSL_SRIO_SetTLMPortBaseRoutingPatternMatch(hSrio, SRIO_PORT_NUM, 1, DEVICE_ID2_16BIT, 0xFFFF);
+//    CSL_SRIO_SetTLMPortBaseRoutingPatternMatch(hSrio, SRIO_PORT_NUM, 2, DEVICE_ID3_16BIT, 0xFFFF);
+//    CSL_SRIO_SetTLMPortBaseRoutingPatternMatch(hSrio, SRIO_PORT_NUM, 3, DEVICE_ID4_16BIT, 0xFFFF);
 //    CSL_SRIO_SetTLMPortBaseRoutingPatternMatch(hSrio, 1, 0, DEVICE_ID2_8BIT,  0xFF);
 
     /* We need to open the Garbage collection queues in the QMSS. This is done to ensure that 

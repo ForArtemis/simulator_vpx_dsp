@@ -273,9 +273,26 @@ int rio_discovery_fabric(Uint32 uiLocalPort)
 		training= uiMaintenanceValue;
 		System_printf("training =0x%08x \n", training);
 
-		if (training & CPS1432_PORTOK_BIT)
+//		if (training & CPS1432_PORTOK_BIT)
+
+		if((portnum == 2)||(portnum == 3)||(portnum == 6)||(portnum == 0))
+//		if((portnum == 2)||(portnum == 3)||(portnum ==0))
 		{
-			System_printf("Trained successfully \n");
+			if(portnum == 2)
+				nextdevid = DEVICE_ID3_16BIT;
+			else if(portnum == 6)
+				nextdevid = DEVICE_ID2_16BIT;
+			else if(portnum == 0)
+//				nextdevid = DEVICE_ID4_16BIT;
+				nextdevid = 0x0005;
+
+//			if(portnum == 2)
+//				nextdevid = DEVICE_ID3_16BIT;
+//			else if(portnum == 0)
+//				nextdevid = DEVICE_ID2_16BIT;
+
+			if (training & CPS1432_PORTOK_BIT)
+				System_printf("Trained successfully \n");
 			KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
 											0xff, ctl_offset, GLOBAL_ADDR(&uiMaintenanceValue),
 											SRIO_PKT_TYPE_MTN_READ,0);
@@ -302,7 +319,7 @@ int rio_discovery_fabric(Uint32 uiLocalPort)
 			if (temp == CPS1432_INIT_PWIDTH_4)
 			{
 				System_printf("4x lane port \n");
-				portstep = 2;
+//				portstep = 2;
 			}
 
 			if (portnum == swport)
@@ -324,8 +341,8 @@ int rio_discovery_fabric(Uint32 uiLocalPort)
 				uiResult= KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0, 0xff,
 						RIO_ROUTE_CFG_PORT, GLOBAL_ADDR(&uiMaintenanceValue),
 						SRIO_PKT_TYPE_MTN_WRITE,0);
-				System_printf("All packets for DeviceID = %04x, now to port %d \n",
-						DEVICE_ID2_16BIT, portnum);
+//				System_printf("All packets for DeviceID = %04x, now to port %d \n",
+//						DEVICE_ID2_16BIT, portnum);
 
 				/********************************************
 				 STEP 8: Read back the DIDCAR of the device connected
@@ -423,8 +440,6 @@ int rio_discovery_fabric(Uint32 uiLocalPort)
 				//System_printf("0x60 bdid was 0x%08x \n",bdid);/* revised by zhouhu 2012.12.02*/
 //				bdid = bdid >> SHIFT_BDIDCSR_TO_DEVICEID;
 				System_printf("Original deviceID = 0x%08x \n", bdid);
-
-				nextdevid = DEVICE_ID2_16BIT;
 				uiMaintenanceValue = nextdevid << SHIFT_BDIDCSR_TO_DEVICEID;
 				uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0, 0xff,
 						RIO_BDIDCSR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
@@ -473,14 +488,14 @@ int rio_discovery_fabric(Uint32 uiLocalPort)
 				nextdevid++;
 			}
 		}
-		else
-		{
-			/********************************************
-			 If not trained, Report port not trained and fill arrays
-			 with values indicating not valid.
-			 *********************************************/
-			System_printf("This port is not trained \n");
-		}
+//		else
+//		{
+//			/********************************************
+//			 If not trained, Report port not trained and fill arrays
+//			 with values indicating not valid.
+//			 *********************************************/
+//			System_printf("This port is not trained \n");
+//		}
 		if (portstep == 2)
 		{
 			portnum++;
@@ -499,6 +514,291 @@ next:
 		}
 
 	}
+
+//	//
+//	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x05, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_READ,0);
+//	hbdidl = uiMaintenanceValue;
+//	System_printf("uiResult = %d\n", uiResult);
+//	System_printf("Original HBDIDL = 0x%08x \n", hbdidl);
+//
+//	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x05, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_READ,1);
+//	hbdidl = uiMaintenanceValue;
+//	System_printf("uiResult = %d\n", uiResult);
+//	System_printf("Original HBDIDL = 0x%08x \n", hbdidl);
+//
+//	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x05, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_READ,2);
+//	hbdidl = uiMaintenanceValue;
+//	System_printf("uiResult = %d\n", uiResult);
+//	System_printf("Original HBDIDL = 0x%08x \n", hbdidl);
+//
+//	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x05, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_READ,3);
+//	hbdidl = uiMaintenanceValue;
+//	System_printf("uiResult = %d\n", uiResult);
+//	System_printf("Original HBDIDL = 0x%08x \n", hbdidl);
+
+
+
+
+
+
+
+//	/***************************************************************
+//	 The remainder of this function is execute for each of the other ports
+//	 on the CPS1432
+//	 ****************************************************************/
+//	System_printf("\nExamine each port on the CPS1432, 'discover' any devices\n");
+//	errstatus_offset = P0_ERR_STATUS_OFFSET;
+//	ctl_offset = P0_CTL_OFFSET;
+//	for (portnum = 0; portnum < numport;)
+//	{
+//		System_printf("\n\nExamining port %d  ", portnum);
+//		portstep = 1;
+//
+//		/************************************************************
+//		 STEP 6 : check training on portX
+//		 Examine the training registers on this CPS1432 port to determine
+//		 if it has trained to another device.
+//		 *************************************************************/
+//		KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//								0xff, errstatus_offset, GLOBAL_ADDR(&uiMaintenanceValue),
+//								SRIO_PKT_TYPE_MTN_READ,0);
+//		training= uiMaintenanceValue;
+//		System_printf("training =0x%08x \n", training);
+//
+//		if (training & CPS1432_PORTOK_BIT)
+//		{
+//			System_printf("Trained successfully \n");
+//			KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//											0xff, ctl_offset, GLOBAL_ADDR(&uiMaintenanceValue),
+//											SRIO_PKT_TYPE_MTN_READ,0);
+//			temp = uiMaintenanceValue;
+//
+//
+//			// 2015_8_26, set INPUT_PORT_EN = 1
+//			uiMaintenanceValue = temp | 0x00200000;
+//			KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//												0xff, ctl_offset, GLOBAL_ADDR(&uiMaintenanceValue),
+//												SRIO_PKT_TYPE_MTN_WRITE,0);
+//			System_printf("set INPUT_PORT_EN for port %d \n", portnum);
+//
+//
+//			temp &= CPS1432_INIT_PWIDTH_MASK;
+//			if (temp == CPS1432_INIT_PWIDTH_1L0)
+//			{
+//				System_printf("Single-lane port\n");
+//			}
+//			if (temp == CPS1432_INIT_PWIDTH_1L2)
+//			{
+//				System_printf("Single-lane port; lane R (redundancy lane)\n");
+//			}
+//			if (temp == CPS1432_INIT_PWIDTH_4)
+//			{
+//				System_printf("4x lane port \n");
+//				portstep = 2;
+//			}
+//
+//			if (portnum == swport)
+//			{
+//				System_printf("This port number == host port number. Discovered myself! \n");
+//			}
+//			else
+//			{
+//				/*************************************************************
+//				 STEP 7: route packets for DeviceID 0xFF to this port
+//				 	 	 Extended Configuration Enable.
+//				 **************************************************************/
+//				uiMaintenanceValue=0xFF;
+//				uiResult= KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0, 0xff,
+//						RIO_ROUTE_CFG_DESTID, GLOBAL_ADDR(&uiMaintenanceValue),
+//					    SRIO_PKT_TYPE_MTN_WRITE,0);
+//
+//				uiMaintenanceValue=portnum;
+//				uiResult= KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0, 0xff,
+//						RIO_ROUTE_CFG_PORT, GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_WRITE,0);
+//				System_printf("All packets for DeviceID = %04x, now to port %d \n",
+//						DEVICE_ID2_16BIT, portnum);
+//
+//				/********************************************
+//				 STEP 8: Read back the DIDCAR of the device connected
+//				 to this port.
+//				 ********************************************/
+//				System_printf("Examine didcar of device attached to port %d \n",
+//						portnum);
+//
+//				KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//							0xff, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//							SRIO_PKT_TYPE_MTN_READ,1);
+//				temp= uiMaintenanceValue;
+//
+//				if (temp == TMS6678_DIDCAR_VALUE)
+//				{
+//					System_printf(" TMS6678 device connected to port %d \n", portnum);
+//				}
+//				else
+//				{
+//					if (temp == FPGA_DIDCAR_VALUE)  // v7 data sheet
+//					{
+//						System_printf("FPGA rapid IO device connect to port %d\n", portnum);
+//					}
+//					else
+//					{
+//						System_printf("Find device connect to port %d unknown!!!!\n", portnum);
+//						System_printf("DIDCAR is %08x, while FPGA_DIDCAR_VALUE is 0x0370000E. \n", temp);
+////						return -1;
+////						goto next;
+//					}
+//				}
+//
+//				if (nextdevid > MAX_DEVICES)
+//				{
+//					System_printf("Found too many devices. Cannot allocate deviceid  \n");
+//					return 1;
+//				}
+//				/********************************************
+//				 STEP 9: Read back the HBDIDL on the device
+//				 This is the lock register which determines which
+//				 device can initialize the agent. 0xFFFF indicates
+//				 that the device has not yet been initialized, if the
+//				 HBDIDL is some other value, issue warning but continue
+//				 ********************************************/
+//				uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//									0xff, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//									SRIO_PKT_TYPE_MTN_READ,1);
+//				hbdidl = uiMaintenanceValue;
+//				System_printf("Original HBDIDL = 0x%08x \n", hbdidl);
+//				if (hbdidl != HBDIDLCSR_NOT_LOCKED)
+//				{
+//					System_printf("WARNING : HBDIDL of this device was 0x%08x \n", hbdidl);
+//				}
+//
+//				/********************************************
+//				 STEP 10 : Attempt to lock HBDIDL, write
+//				 the device ID of this device
+//				 ********************************************/
+//
+//				uiMaintenanceValue = (gpSRIO_regs->RIO_BASE_ID&
+//						CSL_SRIO_RIO_BASE_ID_BASE_ID_MASK) >>
+//						CSL_SRIO_RIO_BASE_ID_BASE_ID_SHIFT;
+//
+//				uiResult= KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0, 0xff,
+//						RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//					SRIO_PKT_TYPE_MTN_WRITE,1);
+//
+//				/********************************************
+//				 STEP 11: check that the lock has been accepted
+//				 If the lock has not been accepted, issue warning, but continue
+//				 (dangerous!!!!)
+//				 ********************************************/
+//				uiResult=KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//									0xff, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//									SRIO_PKT_TYPE_MTN_READ,1);
+//				hbdidl= uiMaintenanceValue;
+//				System_printf("Updated HBDIDL = 0x%08x \n", hbdidl);
+//				if (hbdidl != ((gpSRIO_regs->RIO_BASE_ID&
+//						CSL_SRIO_RIO_BASE_ID_BASE_ID_MASK) >>
+//						CSL_SRIO_RIO_BASE_ID_BASE_ID_SHIFT))
+//				{
+//					System_printf("WARNING: HBDIDL not updated, Lock not accepted\n");
+//					System_printf("WARINING : This application continues regardless...");
+//				}
+//
+//				/********************************************
+//				 STEP 12: Update the device ID
+//				 Regardless of the DeviceID which was read back, we will update
+//				 it with the device ID we want
+//				 *********************************************/
+//				uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//									0xff, RIO_BDIDCSR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//									SRIO_PKT_TYPE_MTN_READ,1);
+//				bdid= uiMaintenanceValue;
+//				//System_printf("0x60 bdid was 0x%08x \n",bdid);/* revised by zhouhu 2012.12.02*/
+////				bdid = bdid >> SHIFT_BDIDCSR_TO_DEVICEID;
+//				System_printf("Original deviceID = 0x%08x \n", bdid);
+//
+//				nextdevid = DEVICE_ID2_16BIT;
+//				uiMaintenanceValue = nextdevid << SHIFT_BDIDCSR_TO_DEVICEID;
+//				uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0, 0xff,
+//						RIO_BDIDCSR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//					SRIO_PKT_TYPE_MTN_WRITE,1);
+//
+//				System_printf("Allocated deviceID = 0x%08x \n", nextdevid);
+//
+//				/*********************************************
+//				 STEP 13: Update the routing tables with this new information
+//				 ***********************************************/
+//				uiMaintenanceValue = nextdevid;
+//				uiResult= KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0, 0xff,
+//						RIO_ROUTE_CFG_DESTID, GLOBAL_ADDR(&uiMaintenanceValue),
+//					SRIO_PKT_TYPE_MTN_WRITE,0);
+//
+//				uiMaintenanceValue = portnum;
+//				uiResult= KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0, 0xff,
+//						RIO_ROUTE_CFG_PORT, GLOBAL_ADDR(&uiMaintenanceValue),
+//					SRIO_PKT_TYPE_MTN_WRITE,0);
+//
+//				System_printf("All packets for DeviceID = 0x%04x, now to port %d \n",
+//						nextdevid, portnum);
+//
+//				/********************************************
+//				 STEP 14: Read back the BDIDCAR using the
+//				 updated device ID
+//				 ********************************************/
+//				uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						nextdevid, RIO_BDIDCSR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//									SRIO_PKT_TYPE_MTN_READ,1);
+//				bdid = uiMaintenanceValue;
+//				if ((bdid >> SHIFT_BDIDCSR_TO_DEVICEID) == nextdevid)
+//				{
+//					System_printf("Comfirmed read operation using new device id \n");
+//				}
+//				else
+//				{
+//					System_printf(
+//							"ERROR : Unexpected value returned from bdid read = 0x%08x \n",
+//							bdid);
+//				}
+//
+//				/*********************************************
+//				 STEP 15: update the next deviceID that the host can allocate
+//				 **************************************************/
+//				nextdevid++;
+//			}
+//		}
+//		else
+//		{
+//			/********************************************
+//			 If not trained, Report port not trained and fill arrays
+//			 with values indicating not valid.
+//			 *********************************************/
+//			System_printf("This port is not trained \n");
+//		}
+//		if (portstep == 2)
+//		{
+//			portnum++;
+//			errstatus_offset += CPS1432_PORT_STRIDE;
+//			ctl_offset += CPS1432_PORT_STRIDE;
+//			portnum++;
+//			errstatus_offset += CPS1432_PORT_STRIDE;
+//			ctl_offset += CPS1432_PORT_STRIDE;
+//		}
+//		else
+//		{
+//next:
+//			portnum++;
+//			errstatus_offset += CPS1432_PORT_STRIDE;
+//			ctl_offset += CPS1432_PORT_STRIDE;
+//		}
+//
+//	}
 
 	System_printf("\n");
 
