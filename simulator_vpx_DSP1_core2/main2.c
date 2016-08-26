@@ -292,7 +292,7 @@ void MainThread()
 	int 	status;
 	int		ManualMsgID = 0;
 
-	Msg0To2Ptr = (MsgCore0ToCore2*)malloc(sizeof(MsgCore0ToCore2));
+	Msg0To2Ptr = (MsgCore0ToCore2*)malloc(sizeof(MsgCore0ToCore2));	//使用default heap，maximum default type alignment
 	System_printf("MsgCore0ToCore2 malloc size is %d.\n", sizeof(MsgCore0ToCore2));
 	if(!Msg0To2Ptr)//如果malloc失败
 	{

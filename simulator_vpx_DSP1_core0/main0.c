@@ -422,8 +422,8 @@ extern void ManualModeTimerIsr();
 //---------------------------------------------------------------------
 int main()
 {
-	/* Hyperlink初始化 */
-	HyperlinkInit();
+	/*Hyperlink初始化 */
+//	HyperlinkInit();
 
 	EVM_init();
 

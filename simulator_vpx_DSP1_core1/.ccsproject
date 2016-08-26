@@ -4,7 +4,7 @@
 	<deviceVariant value="com.ti.ccstudio.deviceModel.C6000.GenericC66xxDevice"/>
 	<deviceFamily value="C6000"/>
 	<deviceEndianness value="little"/>
-	<codegenToolVersion value="7.4.0"/>
+	<codegenToolVersion value="7.2.0"/>
 	<isElfFormat value="true"/>
 	<connection value=""/>
 	<rts value="libc.a"/>

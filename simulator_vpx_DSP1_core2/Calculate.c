@@ -6,6 +6,63 @@
 //---------------散射点信息存储位置--------------------------
 extern ScatteringPoint		*ScatteringPointPtr;
 
+//-------------------函数声明-----------------------
+void CoordinateCalculateOriginToTrans(float OriginToTransAngleGamma, float OriginToTransAnglePhi, float OriginToTransAngleTheta,
+                                   float OriginalX, float OriginalY, float OriginalZ,
+                                   float *TransX, float *TransY, float *TransZ);
+void CoordinateCalculateTransToOrigin(float TransToOriginAngleGamma, float TransToOriginAnglePhi, float TransToOriginAngleTheta,
+                                   float OriginalX, float OriginalY, float OriginalZ,
+                                   float *TransX, float *TransY, float *TransZ);
+void LineDeviationCal(
+				ScatteringPoint		*ScatteringPointPtr,
+				Point	*PointSight,	//视线坐标系下散射点坐标
+				Point	*PointGround,	//地理坐标系下散射点坐标
+				float   RadarTranX,
+				float   RadarTranY,
+				float   RadarTranZ,
+				float   TargetX,
+				float   TargetY,
+				float   TargetZ,
+				float   RadarRecvX,
+				float   RadarRecvY,
+				float   RadarRecvZ,
+				float	*LineDeviationY,
+				float	*LineDeviationZ
+);
+Uint32 DopplerFrePincCal(float TargetSpeedTran, float TargetSpeedRecv);
+Uint16 PowerCal(float Power);
+Uint16 DistanceDelayCal(float TargetDistanceRecv, float TargetDistanceTran);
+
+/* 计算距离对应的FPGA内延时 */
+Uint16 DistanceDelayCal(float TargetDistanceRecv, float TargetDistanceTran)
+{
+	return	((TargetDistanceRecv + TargetDistanceTran) / LIGHT_SPEED * FPGA_CLK_FRE)
+			+ DISTANCE_DELAY_COMPENSATION;
+}
+
+/* 计算速度多普勒对应的FPGA中DDS的频率控制字 */
+Uint32 DopplerFrePincCal(float TargetSpeedTran, float TargetSpeedRecv)
+{
+	//正频率
+	if(TargetSpeedTran + TargetSpeedRecv >= 0)
+	{
+		return	(TargetSpeedTran + TargetSpeedRecv)
+				* WAVE_FRE / LIGHT_SPEED * 0xffffffff / FPGA_CLK_FRE;
+	}
+	//负频率
+	else
+	{
+		return	(TargetSpeedTran + TargetSpeedRecv)
+				* WAVE_FRE / LIGHT_SPEED * 0xffffffff / FPGA_CLK_FRE + 0xffffffff;
+	}
+}
+
+/* 计算功率对应的幅度 */
+Uint16 PowerCal(float Power)
+{
+	return sqrt(pow(10,((Power - SIG_POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
+}
+
 /* 顺序按照OY、OZ、OX依次旋转phi、theta、gamma */
 //计算坐标,已知从A坐标系转换到B坐标系的旋转关系，求A坐标系中点在B坐标系下坐标
 void CoordinateCalculateOriginToTrans(float OriginToTransAngleGamma, float OriginToTransAnglePhi, float OriginToTransAngleTheta,
@@ -168,25 +225,24 @@ void PointTargetCal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Msg2To1Ptr, Ms
 
 	//用距离计算延时
 	Msg2To1Ptr->DistanceDelay =
-			((Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetDistanceRecv +
-					Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetDistanceTran)
-					/ LIGHT_SPEED * FPGA_CLK_FRE) + DISTANCE_DELAY_COMPENSATION;
+			DistanceDelayCal(Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetDistanceRecv,
+							Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetDistanceTran);
+
 	//用速度计算频率控制字
-	Msg2To1Ptr->DopplerFrePinc = 2 *
-								(Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetSpeedTran +
-										Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetSpeedRecv)
-								* WAVE_FRE / LIGHT_SPEED * 0xffffffff / FPGA_CLK_FRE;
+	Msg2To1Ptr->DopplerFrePinc =
+			DopplerFrePincCal(Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetSpeedTran,
+								Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetSpeedRecv);
+
 	//用功率计算幅度
 	for(i = 0 ; i < RANGE_PROFILE_NUM ; i++)
 	{
 		Msg2To1Ptr->RangeProfile[i] = 0;
 	}
 	Msg2To1Ptr->RangeProfile[(int)(RANGE_PROFILE_NUM/2)] =
-			sqrt(pow(10,((Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetPower - SIG_POEWR_MAX_DBM)/10))
-					* AMPLITUDE_MAX * AMPLITUDE_MAX);
+			PowerCal(Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetPower);
 
 	//噪声功率
-	Msg2To1Ptr->NoisePower = sqrt(pow(10,((Msg0To2Ptr->NoisePower - SIG_POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
+	Msg2To1Ptr->NoisePower = PowerCal(Msg0To2Ptr->NoisePower);
 
 	//角度赋值
 	Msg2To34567Ptr->TargetAngleTheta = Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetTheta;
@@ -250,20 +306,19 @@ void RangeSpreadTargetParam0Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 						(double)10 * log10(4 * PI * (double)R1 * R1) -
 						(double)10 * log10(4 * PI * (double)R2 * R2);
 		Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam0SetBackFrame.RangeProfile[i] = Power;	//回传数据
-		Msg2To1Ptr->RangeProfile[i] =
-				sqrt(pow(10,((Power - SIG_POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
+		Msg2To1Ptr->RangeProfile[i] = PowerCal(Power);
 	}
 
 	//噪声功率
-	Msg2To1Ptr->NoisePower = sqrt(pow(10,((Msg0To2Ptr->NoisePower - SIG_POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
+	Msg2To1Ptr->NoisePower = PowerCal(Msg0To2Ptr->NoisePower);
 
 	//用距离计算延时
-	Msg2To1Ptr->DistanceDelay = (R1 + R2) / LIGHT_SPEED * FPGA_CLK_FRE + DISTANCE_DELAY_COMPENSATION;
+	Msg2To1Ptr->DistanceDelay = DistanceDelayCal(R2, R1);
+
 	//用速度计算频率控制字
-	Msg2To1Ptr->DopplerFrePinc = 2 *
-								(Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetSpeedTran +
-										Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetSpeedRecv)
-								* WAVE_FRE / LIGHT_SPEED * 0xffffffff / FPGA_CLK_FRE;
+	Msg2To1Ptr->DopplerFrePinc =
+			DopplerFrePincCal(Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetSpeedTran,
+								Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetSpeedRecv);
 
 	//角度赋值
 	Msg2To34567Ptr->TargetAngleTheta = Msg0To2Ptr->TargetParam.RangeSpreadTargetParam0Msg.TargetTheta;
@@ -306,14 +361,13 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 					(GroundCoordRadarRecvZ - GroundCoordTargetZ)*(GroundCoordRadarRecvZ - GroundCoordTargetZ));
 
 	/* 用距离计算延时 */
-	Msg2To1Ptr->DistanceDelay =
-			((TranR + RecvR) / LIGHT_SPEED * FPGA_CLK_FRE) + DISTANCE_DELAY_COMPENSATION;
-	/* 用速度计算频率控制字 */
-	Msg2To1Ptr->DopplerFrePinc = 2 *
-								(Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.TargetSpeedTran +
-										Msg0To2Ptr->TargetParam.RangeSpreadTargetParam1Msg.TargetSpeedRecv)
-								* WAVE_FRE / LIGHT_SPEED * 0xffffffff / FPGA_CLK_FRE;
+	Msg2To1Ptr->DistanceDelay =	DistanceDelayCal(RecvR, TranR);
 
+	/* 用速度计算频率控制字 */
+	//用速度计算频率控制字
+	Msg2To1Ptr->DopplerFrePinc =
+			DopplerFrePincCal(Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetSpeedTran,
+								Msg0To2Ptr->TargetParam.PointTargetParamMsg.TargetSpeedRecv);
 
 	/* 计算目标在阵面坐标系下的方位和俯仰角 */
 	float	RadarCoordTheta;
@@ -329,8 +383,8 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 					&TargetRadarZ
 					);
 	//计算得出阵面坐标系下目标的坐标
-	RadarCoordTheta = atan(TargetRadarZ/TargetRadarX);
-	RadarCoordPhi = atan(TargetRadarY / sqrt(TargetRadarX*TargetRadarX + TargetRadarZ*TargetRadarZ));
+	RadarCoordTheta = atan2(TargetRadarZ, TargetRadarX);
+	RadarCoordPhi = atan2(TargetRadarY, sqrt(TargetRadarX*TargetRadarX + TargetRadarZ*TargetRadarZ));
 
 
 	/* 计算视线坐标系下散射点位置 */
@@ -391,8 +445,8 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 					&LineDeviationY,
 					&LineDeviationZ
 	);
-	AngleDeviationTheta = atan(LineDeviationY / RecvR) / PI * 180;
-	AngleDeviationPhi = atan(LineDeviationZ / RecvR) / PI * 180;
+	AngleDeviationTheta = atan2(LineDeviationY, RecvR) / PI * 180;
+	AngleDeviationPhi = atan2(LineDeviationZ, RecvR) / PI * 180;
 
 
 	/* 角度赋值  */
@@ -427,12 +481,11 @@ void RangeSpreadTargetParam1Cal(MsgCore0ToCore2 *Msg0To2Ptr, MsgCore2ToCore1 *Ms
 						(double)10 * log10(4 * PI * (double)TranR * TranR) -
 						(double)10 * log10(4 * PI * (double)RecvR * RecvR);
 		Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame.RangeProfile[i] = Power;	//回传数据
-		Msg2To1Ptr->RangeProfile[i] =
-				sqrt(pow(10,((Power - SIG_POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
+		Msg2To1Ptr->RangeProfile[i] = PowerCal(Power);
 	}
 
 	//噪声功率
-	Msg2To1Ptr->NoisePower = sqrt(pow(10,((Msg0To2Ptr->NoisePower - SIG_POEWR_MAX_DBM)/10)) * AMPLITUDE_MAX * AMPLITUDE_MAX);
+	Msg2To1Ptr->NoisePower = PowerCal(Msg0To2Ptr->NoisePower);
 
 	//回传数据
 	Msg2To0Ptr->TargetParamBack.RangeSpreadTargetParam12SetBackFrame.AngleDeviationPhi = AngleDeviationPhi;

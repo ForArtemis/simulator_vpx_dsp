@@ -101,24 +101,135 @@ int rio_discovery(Uint32 uiLocalPort)
 				0x00, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
 				SRIO_PKT_TYPE_MTN_READ,0);
 	didcaradj= uiMaintenanceValue;
-	/************************************************************
-	 STEP 2:
-	 If adjacent device is CPS1432, execute the fabric version of the
-	 descovery process, else Exit
-	 *************************************************************/
+//	/************************************************************
+//	 STEP 2:
+//	 If adjacent device is CPS1432, execute the fabric version of the
+//	 descovery process, else Exit
+//	 *************************************************************/
+//	if (didcaradj == CPS1432_DIDCAR_VALUE)
+//	{
+//		System_printf("Identified adjacent device as CPS1432\n");
+//		system_type = FABRIC_SYSTEM;
+//		result = rio_discovery_fabric(uiLocalPort);
+//	}
+//	else
+//	{
+//		System_printf("ERROR : Adjacent device is not CPS1432, Read back didcar of 0x%08x \n",
+//				didcaradj);
+//		System_printf ("Please re-start \n");
+//		return UNKNOWN_DEVICE;
+//	}
+
+
 	if (didcaradj == CPS1432_DIDCAR_VALUE)
 	{
-		System_printf("Identified adjacent device as CPS1432\n");
-		system_type = FABRIC_SYSTEM;
-		result = rio_discovery_fabric(uiLocalPort);
+
+		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+						0x00,  0xF20054, GLOBAL_ADDR(&uiMaintenanceValue),
+						SRIO_PKT_TYPE_MTN_READ,0);
+		didcaradj= uiMaintenanceValue;
+		System_printf("offset = 0xF20054\n");
+		System_printf("uiResult = %d\n", uiResult);
+		System_printf("didcaradj = %08x\n\n", didcaradj);
+
+		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+						0x00,  0x020004, GLOBAL_ADDR(&uiMaintenanceValue),
+						SRIO_PKT_TYPE_MTN_READ,0);
+		didcaradj= uiMaintenanceValue;
+		System_printf("offset = 0x020004\n");
+		System_printf("uiResult = %d\n", uiResult);
+		System_printf("didcaradj = %08x\n\n", didcaradj);
+
+
+		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+						0x00,  0xE00000, GLOBAL_ADDR(&uiMaintenanceValue),
+						SRIO_PKT_TYPE_MTN_READ,0);
+		didcaradj= uiMaintenanceValue;
+		System_printf("offset = 0xE00000\n");
+		System_printf("uiResult = %d\n", uiResult);
+		System_printf("didcaradj = %08x\n\n", didcaradj);
+
+		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+						0x00,  0xE00004, GLOBAL_ADDR(&uiMaintenanceValue),
+						SRIO_PKT_TYPE_MTN_READ,0);
+		didcaradj= uiMaintenanceValue;
+		System_printf("offset = 0xE00004\n");
+		System_printf("uiResult = %d\n", uiResult);
+		System_printf("didcaradj = %08x\n\n", didcaradj);
+
+		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+						0x00,  0xE00008, GLOBAL_ADDR(&uiMaintenanceValue),
+						SRIO_PKT_TYPE_MTN_READ,0);
+		didcaradj= uiMaintenanceValue;
+		System_printf("offset = 0xE00008\n");
+		System_printf("uiResult = %d\n", uiResult);
+		System_printf("didcaradj = %08x\n\n", didcaradj);
+
+		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+						0x00,  0xE0000c, GLOBAL_ADDR(&uiMaintenanceValue),
+						SRIO_PKT_TYPE_MTN_READ,0);
+		didcaradj= uiMaintenanceValue;
+		System_printf("offset = 0xE0000c\n");
+		System_printf("uiResult = %d\n", uiResult);
+		System_printf("didcaradj = %08x\n\n", didcaradj);
+
+		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+						0x00,  0xE00010, GLOBAL_ADDR(&uiMaintenanceValue),
+						SRIO_PKT_TYPE_MTN_READ,0);
+		didcaradj= uiMaintenanceValue;
+		System_printf("offset = 0xE00010\n");
+		System_printf("uiResult = %d\n", uiResult);
+		System_printf("didcaradj = %08x\n\n", didcaradj);
+
+//		uiMaintenanceValue = 6;
+//		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x00,  0xE00008, GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_WRITE,0);
+//		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x00,  0xE00008, GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_READ,0);
+//		didcaradj= uiMaintenanceValue;
+//		System_printf("offset = 0xE00008\n");
+//		System_printf("uiResult = %d\n", uiResult);
+//		System_printf("didcaradj = %08x\n\n", didcaradj);
+		//打开端口3和6
+//		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x00,  (0x00015C + 0x20 * 3), GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_READ,0);
+//		uiMaintenanceValue = uiMaintenanceValue | 0x00600000;
+//		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x00,  (0x00015C + 0x20 * 3), GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_WRITE,0);
+		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+						0x00,  (0x00015C + 0x20 * 3), GLOBAL_ADDR(&uiMaintenanceValue),
+						SRIO_PKT_TYPE_MTN_READ,0);
+		didcaradj= uiMaintenanceValue;
+		System_printf("offset = (0x00015C + 0x20 * 3)\n");
+		System_printf("uiResult = %d\n", uiResult);
+		System_printf("didcaradj = %08x\n\n", didcaradj);
+
+//		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x00,  (0x00015C + 0x20 * 6), GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_READ,0);
+//		uiMaintenanceValue = uiMaintenanceValue | 0x00600000;	//位与正常相反（CPS1432的大端数据）
+//		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//						0x00,  (0x00015C + 0x20 * 6), GLOBAL_ADDR(&uiMaintenanceValue),
+//						SRIO_PKT_TYPE_MTN_WRITE,0);
+		uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+						0x00,  (0x00015C + 0x20 * 6), GLOBAL_ADDR(&uiMaintenanceValue),
+						SRIO_PKT_TYPE_MTN_READ,0);
+		didcaradj= uiMaintenanceValue;
+		System_printf("offset = (0x00015C + 0x20 * 6)\n");
+		System_printf("uiResult = %d\n", uiResult);
+		System_printf("didcaradj = %08x\n\n", didcaradj);
+
+
+
+
+		result = 0;
 	}
-	else
-	{
-		System_printf("ERROR : Adjacent device is not CPS1432, Read back didcar of 0x%08x \n",
-				didcaradj);
-		System_printf ("Please re-start \n");
-		return UNKNOWN_DEVICE;
-	}
+
+
 	return result;
 }
 
@@ -275,16 +386,23 @@ int rio_discovery_fabric(Uint32 uiLocalPort)
 
 //		if (training & CPS1432_PORTOK_BIT)
 
-		if((portnum == 2)||(portnum == 3)||(portnum == 6)||(portnum == 0))
+		if((portnum == 2)||(portnum == 3)||(portnum == 6))
 //		if((portnum == 2)||(portnum == 3)||(portnum ==0))
 		{
 			if(portnum == 2)
 				nextdevid = DEVICE_ID3_16BIT;
+//			else if(portnum == 6)
+//				nextdevid = DEVICE_ID2_16BIT;
+//			else if(portnum == 0)
+////				nextdevid = DEVICE_ID4_16BIT;
+//				nextdevid = 0x0005;
+//			else if(portnum == 1)
+//				nextdevid = 0x0006;
 			else if(portnum == 6)
 				nextdevid = DEVICE_ID2_16BIT;
-			else if(portnum == 0)
-//				nextdevid = DEVICE_ID4_16BIT;
-				nextdevid = 0x0005;
+//			else if(portnum == 5)
+//				nextdevid = 0x0008;
+
 
 //			if(portnum == 2)
 //				nextdevid = DEVICE_ID3_16BIT;
@@ -514,35 +632,92 @@ next:
 		}
 
 	}
+	//
+	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+				0x02, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+				SRIO_PKT_TYPE_MTN_READ,0);
+	hbdidl= uiMaintenanceValue;
+	System_printf("uiResult = %d\n", uiResult);
+	System_printf("didcaradj = %d\n", hbdidl);
 
-//	//
+	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+				0x02, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+				SRIO_PKT_TYPE_MTN_READ,1);
+	hbdidl= uiMaintenanceValue;
+	System_printf("uiResult = %d\n", uiResult);
+	System_printf("didcaradj = %d\n", hbdidl);
+
+	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+				0x02, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+				SRIO_PKT_TYPE_MTN_READ,2);
+	hbdidl= uiMaintenanceValue;
+	System_printf("uiResult = %d\n", uiResult);
+	System_printf("didcaradj = %d\n", hbdidl);
+
+
+
 //	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
-//						0x05, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
-//						SRIO_PKT_TYPE_MTN_READ,0);
-//	hbdidl = uiMaintenanceValue;
+//				0x06, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//				SRIO_PKT_TYPE_MTN_READ,0);
+//	hbdidl= uiMaintenanceValue;
 //	System_printf("uiResult = %d\n", uiResult);
-//	System_printf("Original HBDIDL = 0x%08x \n", hbdidl);
+//	System_printf("didcaradj = %d\n", hbdidl);
 //
 //	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
-//						0x05, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
-//						SRIO_PKT_TYPE_MTN_READ,1);
-//	hbdidl = uiMaintenanceValue;
+//				0x06, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//				SRIO_PKT_TYPE_MTN_READ,1);
+//	hbdidl= uiMaintenanceValue;
 //	System_printf("uiResult = %d\n", uiResult);
-//	System_printf("Original HBDIDL = 0x%08x \n", hbdidl);
+//	System_printf("didcaradj = %d\n", hbdidl);
 //
 //	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
-//						0x05, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
-//						SRIO_PKT_TYPE_MTN_READ,2);
-//	hbdidl = uiMaintenanceValue;
+//				0x06, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//				SRIO_PKT_TYPE_MTN_READ,2);
+//	hbdidl= uiMaintenanceValue;
 //	System_printf("uiResult = %d\n", uiResult);
-//	System_printf("Original HBDIDL = 0x%08x \n", hbdidl);
+//	System_printf("didcaradj = %d\n", hbdidl);
+
+//	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//				0x07, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//				SRIO_PKT_TYPE_MTN_READ,0);
+//	hbdidl= uiMaintenanceValue;
+//	System_printf("uiResult = %d\n", uiResult);
+//	System_printf("didcaradj = %d\n", hbdidl);
 //
 //	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
-//						0x05, RIO_HOSTLOCK_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
-//						SRIO_PKT_TYPE_MTN_READ,3);
-//	hbdidl = uiMaintenanceValue;
+//				0x07, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//				SRIO_PKT_TYPE_MTN_READ,1);
+//	hbdidl= uiMaintenanceValue;
 //	System_printf("uiResult = %d\n", uiResult);
-//	System_printf("Original HBDIDL = 0x%08x \n", hbdidl);
+//	System_printf("didcaradj = %d\n", hbdidl);
+//
+//	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//				0x07, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//				SRIO_PKT_TYPE_MTN_READ,2);
+//	hbdidl= uiMaintenanceValue;
+//	System_printf("uiResult = %d\n", uiResult);
+//	System_printf("didcaradj = %d\n", hbdidl);
+
+//	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//				0x08, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//				SRIO_PKT_TYPE_MTN_READ,0);
+//	hbdidl= uiMaintenanceValue;
+//	System_printf("uiResult = %d\n", uiResult);
+//	System_printf("didcaradj = %d\n", hbdidl);
+//
+//	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//				0x08, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//				SRIO_PKT_TYPE_MTN_READ,1);
+//	hbdidl= uiMaintenanceValue;
+//	System_printf("uiResult = %d\n", uiResult);
+//	System_printf("didcaradj = %d\n", hbdidl);
+//
+//	uiResult = KeyStone_SRIO_Maintenance_hop(uiLocalPort, 0,
+//				0x08, RIO_DIDCAR_OFFSET, GLOBAL_ADDR(&uiMaintenanceValue),
+//				SRIO_PKT_TYPE_MTN_READ,2);
+//	hbdidl= uiMaintenanceValue;
+//	System_printf("uiResult = %d\n", uiResult);
+//	System_printf("didcaradj = %d\n", hbdidl);
 
 
 
@@ -804,6 +979,7 @@ next:
 
 	return SUCCESS;
 }
+
 
 
 

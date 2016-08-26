@@ -172,13 +172,14 @@ int UdpFunc( SOCKET s, UINT32 unused )
 //		memcpy(	&HyplinkDataDsp1Dsp2Buffer,
 //				&(WorkParamUdpFramePtr->JammingFrameId),
 //				sizeof(HyplinkDataDsp1Dsp2Buffer) - sizeof(HyplinkDataDsp1Dsp2Buffer.JammingParamDsp2ToDsp1));
+		//通过HyperLink发送给DSP2
 		memcpy(	&bufferThroughHypLnk->JammingFrameId,
 				&(WorkParamUdpFramePtr->JammingFrameId),
 				sizeof(HyplinkDataDsp1Dsp2) - sizeof(bufferThroughHypLnk->JammingParamDsp2ToDsp1));
 		bufferThroughHypLnk->TargetFrameId = WorkParamUdpFramePtr->TargetFrameId;
 		bufferThroughHypLnk->NewFlag = 1;
+		//设定MsgID
 		MessageQ_setMsgId(&(Msg0To2Ptr->header), MsgID++);
-
 
 		/* 提取目标参数 */
 		//点目标
@@ -210,7 +211,7 @@ int UdpFunc( SOCKET s, UINT32 unused )
 			System_printf("RANGE_SPREAD_TARGET_2\n");
 		}
 
-		//发送噪声功率
+		//提取噪声功率
 		Msg0To2Ptr->NoisePower = WorkParamUdpFramePtr->NoisePower;
 
 		/* Send message to core 2. */
